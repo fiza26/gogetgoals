@@ -5,7 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <header>
     <nav>
-      <RouterLink to="/"><span>Home</span></RouterLink>
+      <RouterLink to="/"><span><i class="fa-solid fa-house"></i></span></RouterLink>
     </nav>
   </header>
 
@@ -14,6 +14,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
 * {
   margin: 0;

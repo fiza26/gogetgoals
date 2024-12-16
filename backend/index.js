@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { getGoals, getGoal, createGoal } from './database.js'
+import { getGoals, getGoal, createGoal, deleteGoal } from './database.js'
 
 const app = express()
 app.use(cors());
@@ -32,6 +32,18 @@ app.post('/creategoal', async (req, res) => {
     } catch (error) {
         console.log('Error creating goal', error)
         res.status(500).json({ error: 'An error occured while creating a goal' })
+    }
+})
+
+// Delete goal
+app.post('/deletegoal', async (req, res) => {
+    try {
+        const { id } = req.body
+        await deleteGoal(id)
+        res.status(200).json({ message: 'Goal deleted sucessfully' })
+    } catch (error) {
+        console.log('Error deleting goal', error)
+        res.status(500).json({ error: 'An error occured while deleting a goal' })
     }
 })
 

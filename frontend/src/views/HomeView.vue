@@ -13,7 +13,8 @@ async function getAllGoals() {
     const response = await axios.get('http://localhost:8000/goals')
     allGoals.value = response.data.result.map(goal => ({
       ...goal,
-      emoji: emojis.value[Math.floor(Math.random() * emojis.value.length)]
+      emoji: emojis.value[Math.floor(Math.random() * emojis.value.length)],
+      optionsState: false
     }))
   } catch (error) {
     console.log(error)
@@ -44,7 +45,26 @@ async function addNewGoal() {
       description: goalDescription.value
     })
     newGoal.value = response.data.result
-    modalState.value = false;
+    modalState.value = false
+    await getAllGoals()
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// Edit and delete functionality
+const showOptions = ((goal) => {
+  goal.optionsState = !goal.optionsState
+})
+
+async function deleteGoal(goal) {
+  try {
+    const response = await axios.post('http://localhost:8000/deletegoal', {
+      id: goal.id
+    })
+    if (response.data) {
+      window.alert('Selected goal has been deleted')
+    }
     await getAllGoals()
   } catch (error) {
     console.log(error)
@@ -58,9 +78,9 @@ async function addNewGoal() {
   <main>
     <div class="container">
       <div class="card-container">
-        <div class="add-new" @click="addNew()">+</div>
+        <div class="add-new" @click="addNew()"><i class="fa-solid fa-plus"></i></div>
         <div class="modal" v-if="modalState">
-          <button class="close-modal" @click="closeModal()">X</button>
+          <button class="close-modal" @click="closeModal()"><i class="fa-solid fa-x"></i></button>
           <div class="modal-content">
             <form class="new-goal-form" @submit.prevent>
               <input type="text" placeholder="title" v-model="goalTitle">
@@ -70,10 +90,17 @@ async function addNewGoal() {
           </div>
         </div>
         <div class="card" v-for="goal in allGoals" :key="goal.id">
-          <RouterLink :to='`/details/${goal.id}`'>
+          <div class="card-header">
             <h3>{{ goal.emoji }} {{ goal.title }}</h3>
-            <p>{{ goal.description }}</p>
-            <span>Progress {{ goal.target_value }}</span><br>
+            <span @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
+            <div class="card-header-options" v-if="goal.optionsState">
+              <span><i class="fa-solid fa-pen-to-square"></i></span>
+              <span @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
+            </div>
+          </div>
+          <p>{{ goal.description }}</p>
+          <span>Progress {{ goal.target_value }}</span><br>
+          <RouterLink :to='`/details/${goal.id}`'>
             <button>Update</button>
           </RouterLink>
         </div>
@@ -137,6 +164,7 @@ a {
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 5;
 
       .close-modal {
         position: fixed;
@@ -213,6 +241,23 @@ a {
       margin: 10px;
       background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
       box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      transition: ease-in-out 150ms;
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        cursor: pointer;
+
+        .card-header-options {
+          display: flex;
+          justify-content: space-between;
+          width: 3rem;
+          cursor: pointer;
+          animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+      }
 
       button {
         font-family: 'Poppins', sans-serif;
