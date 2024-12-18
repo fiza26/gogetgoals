@@ -30,6 +30,12 @@ export async function createGoal(title, description, target_value) {
     return rows
 }
 
+// Edit a goal
+export async function editGoal(id, title, description) {
+    const [rows] = await pool.query('UPDATE goals SET title = ?, description = ? WHERE id = ?', [title, description, id])
+    return rows
+}
+
 // Delete a goal
 export async function deleteGoal(id) {
     const [rows] = await pool.query('DELETE from goals WHERE id = ?', [id])

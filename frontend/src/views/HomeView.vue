@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router';
 import axios from 'axios'
 
-
 // Get all goals
 const allGoals = ref([])
 const emojis = ref(['😁', '😭', '😎', '🤖', '😽', '🤩'])
@@ -31,7 +30,10 @@ const addNew = (() => {
 })
 
 const closeModal = (() => {
-  modalState.value = false;
+  modalState.value = false
+  editState.value = false
+  goalTitle.value = ''
+  goalDescription.value = ''
 })
 
 const goalTitle = ref('')
@@ -47,12 +49,43 @@ async function addNewGoal() {
     newGoal.value = response.data.result
     modalState.value = false
     await getAllGoals()
+    goalTitle.value = ''
+    goalDescription.value = ''
   } catch (error) {
     console.log(error)
   }
 }
 
 // Edit and delete functionality
+const editState = ref(false)
+const selectedGoal = ref(null)
+
+const changeEditState = ((goal) => {
+  editState.value = true
+  goalTitle.value = goal.title,
+    goalDescription.value = goal.description,
+    selectedGoal.value = goal
+})
+
+async function editGoal() {
+  try {
+    const response = await axios.post('http://localhost:8000/editgoal', {
+      id: selectedGoal.value.id,
+      title: goalTitle.value,
+      description: goalDescription.value
+    })
+    if (response.data) {
+      window.alert('Selected post has been updated')
+    }
+    await getAllGoals()
+    editState.value = false
+    goalTitle.value = ''
+    goalDescription.value = ''
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const showOptions = ((goal) => {
   goal.optionsState = !goal.optionsState
 })
@@ -79,23 +112,28 @@ async function deleteGoal(goal) {
     <div class="container">
       <div class="card-container">
         <div class="add-new" @click="addNew()"><i class="fa-solid fa-plus"></i></div>
-        <div class="modal" v-if="modalState">
+        <div class="modal" v-if="modalState || editState">
           <button class="close-modal" @click="closeModal()"><i class="fa-solid fa-x"></i></button>
           <div class="modal-content">
-            <form class="new-goal-form" @submit.prevent>
+            <form class="new-goal-form" @submit.prevent v-if="modalState">
               <input type="text" placeholder="title" v-model="goalTitle">
               <input type="text" placeholder="description" v-model="goalDescription">
               <button type="button" @click="addNewGoal">Add New Goal</button>
+            </form>
+            <form class="new-goal-form" @submit.prevent v-if="editState">
+              <input type="text" placeholder="title" v-model="goalTitle">
+              <input type="text" placeholder="description" v-model="goalDescription">
+              <button type="button" @click="editGoal">Update Goal</button>
             </form>
           </div>
         </div>
         <div class="card" v-for="goal in allGoals" :key="goal.id">
           <div class="card-header">
             <h3>{{ goal.emoji }} {{ goal.title }}</h3>
-            <span @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
+            <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
             <div class="card-header-options" v-if="goal.optionsState">
-              <span><i class="fa-solid fa-pen-to-square"></i></span>
-              <span @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
+              <span class="edit-goal" @click="changeEditState(goal)"><i class="fa-solid fa-pen-to-square"></i></span>
+              <span class="delete-goal" @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
             </div>
           </div>
           <p>{{ goal.description }}</p>
@@ -250,12 +288,40 @@ a {
         margin-bottom: 10px;
         cursor: pointer;
 
+        .options {
+          margin-left: 10px;
+          transition: ease-in-out 150ms;
+
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+
         .card-header-options {
           display: flex;
           justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
           width: 3rem;
           cursor: pointer;
+          margin-left: 10px;
           animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+
+          .edit-goal {
+            transition: ease-in-out 150ms;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+
+          .delete-goal {
+            transition: ease-in-out 150ms;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
         }
       }
 
@@ -292,6 +358,13 @@ a {
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    margin-left: 50px;
+    margin-right: 50px;
   }
 }
 </style>
