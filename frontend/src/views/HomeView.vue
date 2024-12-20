@@ -136,8 +136,11 @@ async function deleteGoal(goal) {
               <span class="delete-goal" @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
             </div>
           </div>
-          <p>{{ goal.description }}</p>
-          <span>Progress {{ goal.target_value }}</span><br>
+          <hr>
+          <div class="card-content">
+            <p>{{ goal.description }}</p>
+            <span>Progress {{ goal.target_value }}</span><br>
+          </div>
           <RouterLink :to='`/details/${goal.id}`'>
             <button>Update</button>
           </RouterLink>
@@ -323,6 +326,10 @@ a {
             }
           }
         }
+      }
+
+      .card-content {
+        margin-top: 15px;
       }
 
       button {
