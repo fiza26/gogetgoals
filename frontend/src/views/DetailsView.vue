@@ -61,6 +61,24 @@ getGoal()
                         <button>Update</button>
                     </form>
                 </div>
+                <div class="card-progress">
+                    <div class="card-progress-header">
+                        {{ goal[0].created }}
+                    </div>
+                    <div class="card-progress-content">
+                        <div class="user-progress">
+                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga deserunt architecto nulla
+                                qui
+                                placeat? Accusantium aspernatur alias ab numquam quod!</p>
+                        </div>
+                        <hr>
+                        <div class="ai-response">
+                            <p><i class="fa-solid fa-star"></i> AI Assistant: Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium cum perspiciatis
+                                repellat ullam tenetur ab ut ipsa, quaerat unde minima dolores exercitationem distinctio
+                                non doloremque adipisci voluptatibus facilis nostrum accusamus?</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -78,16 +96,30 @@ a {
     color: black;
 }
 
+hr {
+    border: 1px solid #dddd;
+    border-radius: 15px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
 .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-top: 20px;
     margin-left: 80px;
     margin-right: 80px;
 
     .card-container {
+        max-width: 40rem;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        align-items: center;
+        flex-direction: column;
         position: relative;
+        margin-top: 15px;
+        margin-bottom: 15px;
 
         .add-new {
             display: flex;
@@ -192,10 +224,9 @@ a {
         }
 
         .card {
-            width: 30rem;
+            width: 100%;
             padding: 15px;
             border-radius: 15px;
-            margin: 10px;
             background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             transition: ease-in-out 150ms;
@@ -278,6 +309,36 @@ a {
 
                 &:hover {
                     transform: scale(1.1);
+                }
+            }
+        }
+
+        .card-progress {
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 15px;
+            background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            transition: ease-in-out 150ms;
+
+            .card-progress-header {
+                color: white;
+                border-radius: 15px;
+                padding: 5px;
+                text-align: center;
+                background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+            }
+
+            .card-progress-content {
+                margin-top: 15px;
+
+                .user-progress {
+                    margin-bottom: 15px;
+                }
+
+                .ai-response {
+                    margin-top: 15px;
                 }
             }
         }

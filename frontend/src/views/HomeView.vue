@@ -162,6 +162,12 @@ a {
   color: black;
 }
 
+hr {
+  border: 1px solid #dddd;
+  border-radius: 15px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
 .container {
   margin-top: 20px;
   margin-left: 80px;
@@ -170,7 +176,7 @@ a {
   .card-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
     position: relative;
 
     .add-new {
@@ -276,10 +282,10 @@ a {
     }
 
     .card {
-      width: 30rem;
+      max-width: 40rem;
       padding: 15px;
       border-radius: 15px;
-      margin: 10px;
+      margin-bottom: 15px;
       background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
       box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
       transition: ease-in-out 150ms;
@@ -330,6 +336,11 @@ a {
 
       .card-content {
         margin-top: 15px;
+
+        p {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
 
       button {
