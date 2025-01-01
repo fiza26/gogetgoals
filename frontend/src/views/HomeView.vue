@@ -1,7 +1,14 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router';
+import { RouterLink } from 'vue-router'
 import axios from 'axios'
+import { useGoalsStore } from '@/stores/goalStore'
+
+const goalsStore = useGoalsStore()
+
+const showOptions = (goal) => goalsStore.showOptions(goal)
+const changeEditState = (goal) => goalsStore.changeEditState(goal)
+const editGoal = () => goalsStore.editGoal()
 
 // Get all goals
 const allGoals = ref([])
@@ -57,38 +64,38 @@ async function addNewGoal() {
 }
 
 // Edit and delete functionality
-const editState = ref(false)
-const selectedGoal = ref(null)
+// const editState = ref(false)
+// const selectedGoal = ref(null)
 
-const changeEditState = ((goal) => {
-  editState.value = true
-  goalTitle.value = goal.title,
-    goalDescription.value = goal.description,
-    selectedGoal.value = goal
-})
+// const changeEditState = ((goal) => {
+//   editState.value = true
+//   goalTitle.value = goal.title,
+//     goalDescription.value = goal.description,
+//     selectedGoal.value = goal
+// })
 
-async function editGoal() {
-  try {
-    const response = await axios.post('http://localhost:8000/editgoal', {
-      id: selectedGoal.value.id,
-      title: goalTitle.value,
-      description: goalDescription.value
-    })
-    if (response.data) {
-      window.alert('Selected post has been updated')
-    }
-    await getAllGoals()
-    editState.value = false
-    goalTitle.value = ''
-    goalDescription.value = ''
-  } catch (error) {
-    console.log(error)
-  }
-}
+// async function editGoal() {
+//   try {
+//     const response = await axios.post('http://localhost:8000/editgoal', {
+//       id: selectedGoal.value.id,
+//       title: goalTitle.value,
+//       description: goalDescription.value
+//     })
+//     if (response.data) {
+//       window.alert('Selected post has been updated')
+//     }
+//     await getAllGoals()
+//     editState.value = false
+//     goalTitle.value = ''
+//     goalDescription.value = ''
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
 
-const showOptions = ((goal) => {
-  goal.optionsState = !goal.optionsState
-})
+// const showOptions = ((goal) => {
+//   goal.optionsState = !goal.optionsState
+// })
 
 async function deleteGoal(goal) {
   try {
@@ -112,7 +119,7 @@ async function deleteGoal(goal) {
     <div class="container">
       <div class="card-container">
         <div class="add-new" @click="addNew()"><i class="fa-solid fa-plus"></i></div>
-        <div class="modal" v-if="modalState || editState">
+        <div class="modal" v-if="modalState || goalsStore.editState">
           <button class="close-modal" @click="closeModal()"><i class="fa-solid fa-x"></i></button>
           <div class="modal-content">
             <form class="new-goal-form" @submit.prevent v-if="modalState">
@@ -120,9 +127,9 @@ async function deleteGoal(goal) {
               <input type="text" placeholder="description" v-model="goalDescription">
               <button type="button" @click="addNewGoal">Add New Goal</button>
             </form>
-            <form class="new-goal-form" @submit.prevent v-if="editState">
-              <input type="text" placeholder="title" v-model="goalTitle">
-              <input type="text" placeholder="description" v-model="goalDescription">
+            <form class="new-goal-form" @submit.prevent v-if="goalsStore.editState">
+              <input type="text" placeholder="title" v-model="goalsStore.goalTitle">
+              <input type="text" placeholder="description" v-model="goalsStore.goalDescription">
               <button type="button" @click="editGoal">Update Goal</button>
             </form>
           </div>
