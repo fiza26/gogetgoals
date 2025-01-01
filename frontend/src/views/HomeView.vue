@@ -289,6 +289,7 @@ hr {
       background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
       box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
       transition: ease-in-out 150ms;
+      animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 
       .card-header {
         display: flex;

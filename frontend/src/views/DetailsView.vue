@@ -24,22 +24,6 @@ getGoal()
     <main>
         <div class="container">
             <div class="card-container">
-                <div class="add-new" @click="addNew()"><i class="fa-solid fa-plus"></i></div>
-                <div class="modal" v-if="modalState || editState">
-                    <button class="close-modal" @click="closeModal()"><i class="fa-solid fa-x"></i></button>
-                    <div class="modal-content">
-                        <form class="new-goal-form" @submit.prevent v-if="modalState">
-                            <input type="text" placeholder="title" v-model="goalTitle">
-                            <input type="text" placeholder="description" v-model="goalDescription">
-                            <button type="button" @click="addNewGoal">Add New Goal</button>
-                        </form>
-                        <form class="new-goal-form" @submit.prevent v-if="editState">
-                            <input type="text" placeholder="title" v-model="goalTitle">
-                            <input type="text" placeholder="description" v-model="goalDescription">
-                            <button type="button" @click="editGoal">Update Goal</button>
-                        </form>
-                    </div>
-                </div>
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ goal[0].title }}</h3>
@@ -73,7 +57,8 @@ getGoal()
                         </div>
                         <hr>
                         <div class="ai-response">
-                            <p><i class="fa-solid fa-star"></i> AI Assistant: Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium cum perspiciatis
+                            <p><i class="fa-solid fa-star"></i> AI Assistant: Lorem ipsum dolor sit amet consectetur
+                                adipisicing elit. Accusantium cum perspiciatis
                                 repellat ullam tenetur ab ut ipsa, quaerat unde minima dolores exercitationem distinctio
                                 non doloremque adipisci voluptatibus facilis nostrum accusamus?</p>
                         </div>
@@ -120,6 +105,7 @@ hr {
         position: relative;
         margin-top: 15px;
         margin-bottom: 15px;
+        animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 
         .add-new {
             display: flex;
