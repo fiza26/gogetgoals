@@ -4,6 +4,15 @@ import axios from 'axios'
 
 export const useGoalsStore = defineStore('goals', () => {
 
+    const modalState = ref(false)
+
+    const closeModal = (() => {
+        modalState.value = false
+        editState.value = false
+        goalTitle.value = ''
+        goalDescription.value = ''
+    })
+
     const goalTitle = ref('')
     const goalDescription = ref('')
     const newGoal = ref(null)
@@ -50,6 +59,7 @@ export const useGoalsStore = defineStore('goals', () => {
         changeEditState,
         editGoal,
         showOptions,
+        closeModal
     };
 
 })
