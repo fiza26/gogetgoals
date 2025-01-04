@@ -6,6 +6,10 @@ export const useGoalsStore = defineStore('goals', () => {
 
     const modalState = ref(false)
 
+    const addNew = (() => {
+        modalState.value = true
+      })
+
     const closeModal = (() => {
         modalState.value = false
         editState.value = false
@@ -51,7 +55,22 @@ export const useGoalsStore = defineStore('goals', () => {
         goal.optionsState = !goal.optionsState
     })
 
+    async function deleteGoal(goal) {
+        try {
+          const response = await axios.post('http://localhost:8000/deletegoal', {
+            id: goal.id
+          })
+          if (response.data) {
+            window.alert('Selected goal has been deleted')
+          }
+          await getAllGoals()
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
     return {
+        modalState,
         editState,
         selectedGoal,
         goalTitle,
@@ -59,7 +78,9 @@ export const useGoalsStore = defineStore('goals', () => {
         changeEditState,
         editGoal,
         showOptions,
-        closeModal
+        addNew,
+        closeModal,
+        deleteGoal
     };
 
 })
