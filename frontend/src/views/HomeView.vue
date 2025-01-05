@@ -12,6 +12,7 @@ const editGoal = () => goalsStore.editGoal()
 const addNew = () => goalsStore.addNew()
 const closeModal = () => goalsStore.closeModal()
 const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
+const addNewGoal = () => goalsStore.addNewGoal()
 
 // Get all goals
 const allGoals = ref([])
@@ -31,25 +32,6 @@ async function getAllGoals() {
 }
 getAllGoals()
 
-const goalTitle = ref('')
-const goalDescription = ref('')
-const newGoal = ref(null)
-
-async function addNewGoal() {
-  try {
-    const response = await axios.post('http://localhost:8000/creategoal', {
-      title: goalTitle.value,
-      description: goalDescription.value
-    })
-    newGoal.value = response.data.result
-    modalState.value = false
-    await getAllGoals()
-    goalTitle.value = ''
-    goalDescription.value = ''
-  } catch (error) {
-    console.log(error)
-  }
-}
 
 </script>
 

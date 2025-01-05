@@ -21,6 +21,22 @@ export const useGoalsStore = defineStore('goals', () => {
     const goalDescription = ref('')
     const newGoal = ref(null)
 
+    async function addNewGoal() {
+      try {
+        const response = await axios.post('http://localhost:8000/creategoal', {
+          title: goalTitle.value,
+          description: goalDescription.value
+        })
+        newGoal.value = response.data.result
+        modalState.value = false
+        await getAllGoals()
+        goalTitle.value = ''
+        goalDescription.value = ''
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     // Edit and delete functionality
     const editState = ref(false)
     const selectedGoal = ref(null)
@@ -80,7 +96,8 @@ export const useGoalsStore = defineStore('goals', () => {
         showOptions,
         addNew,
         closeModal,
-        deleteGoal
+        deleteGoal,
+        addNewGoal
     };
 
 })
