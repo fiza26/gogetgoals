@@ -1,5 +1,10 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import { useGoalsStore } from '@/stores/goalStore'
+
+const goalsStore = useGoalsStore()
+
+const addNew = () => goalsStore.addNew()
 </script>
 
 <template>
@@ -7,6 +12,7 @@ import { RouterLink, RouterView } from 'vue-router'
     <nav>
       <RouterLink to="/"><span><i class="fa-solid fa-house"></i></span></RouterLink>
     </nav>
+    <div class="add-new" @click="addNew"><i class="fa-solid fa-plus"></i></div>
   </header>
 
   <RouterView />
@@ -39,5 +45,27 @@ nav {
   background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
   height: 60px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.add-new {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 50px;
+  right: 70px;
+  background-color: #92FE9D;
+  height: 50px;
+  width: 50px;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+  transition: ease-in-out 150ms;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 </style>

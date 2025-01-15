@@ -7,7 +7,6 @@ const goalsStore = useGoalsStore()
 const showOptions = (goal) => goalsStore.showOptions(goal)
 const changeEditState = (goal) => goalsStore.changeEditState(goal)
 const editGoal = () => goalsStore.editGoal()
-const addNew = () => goalsStore.addNew()
 const closeModal = () => goalsStore.closeModal()
 const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 const addNewGoal = () => goalsStore.addNewGoal()
@@ -18,7 +17,6 @@ const addNewGoal = () => goalsStore.addNewGoal()
   <main>
     <div class="container">
       <div class="card-container">
-        <div class="add-new" @click="addNew"><i class="fa-solid fa-plus"></i></div>
         <div class="modal" v-if="goalsStore.modalState || goalsStore.editState">
           <button class="close-modal" @click="closeModal"><i class="fa-solid fa-x"></i></button>
           <div class="modal-content">
@@ -85,28 +83,6 @@ hr {
     flex-wrap: wrap;
     justify-content: space-between;
     position: relative;
-
-    .add-new {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      bottom: 50px;
-      right: 70px;
-      background-color: #92FE9D;
-      height: 50px;
-      width: 50px;
-      border-radius: 50px;
-      color: white;
-      cursor: pointer;
-      background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-      transition: ease-in-out 150ms;
-      box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-
-      &:hover {
-        transform: scale(1.1);
-      }
-    }
 
     .modal {
       position: fixed;
