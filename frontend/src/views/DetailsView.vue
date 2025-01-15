@@ -48,9 +48,9 @@ getGoal()
         </div>
         <div class="container">
             <div class="card-container">
-                <div class="card">
+                <div class="card" v-for="goal in goal" :key="goal.id">
                     <div class="card-header">
-                        <h3>{{ goal[0].title }}</h3>
+                        <h3>{{ goal.title }}</h3>
                         <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-header-options" v-if="goal.optionsState">
                             <span class="edit-goal" @click="changeEditState(goal)"><i
@@ -61,8 +61,8 @@ getGoal()
                     </div>
                     <hr>
                     <div class="card-content">
-                        <p>{{ goal[0].description }}</p>
-                        <span>Progress {{ goal[0].target_value }}</span><br>
+                        <p>{{ goal.description }}</p>
+                        <span>Progress {{ goal.target_value }}</span><br>
                     </div>
                     <form class="update-progress" @submit.prevent>
                         <textarea name="" id="" placeholder="Write your progress here..."></textarea><br>
