@@ -1,7 +1,5 @@
 <script setup>
-import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import axios from 'axios'
 import { useGoalsStore } from '@/stores/goalStore'
 
 const goalsStore = useGoalsStore()
@@ -13,25 +11,6 @@ const addNew = () => goalsStore.addNew()
 const closeModal = () => goalsStore.closeModal()
 const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 const addNewGoal = () => goalsStore.addNewGoal()
-
-// Get all goals
-const allGoals = ref([])
-const emojis = ref(['😁', '😭', '😎', '🤖', '😽', '🤩'])
-
-async function getAllGoals() {
-  try {
-    const response = await axios.get('http://localhost:8000/goals')
-    allGoals.value = response.data.result.map(goal => ({
-      ...goal,
-      emoji: emojis.value[Math.floor(Math.random() * emojis.value.length)],
-      optionsState: false
-    }))
-  } catch (error) {
-    console.log(error)
-  }
-}
-getAllGoals()
-
 
 </script>
 
@@ -55,7 +34,7 @@ getAllGoals()
             </form>
           </div>
         </div>
-        <div class="card" v-for="goal in allGoals" :key="goal.id">
+        <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id">
           <div class="card-header">
             <h3>{{ goal.emoji }} {{ goal.title }}</h3>
             <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
