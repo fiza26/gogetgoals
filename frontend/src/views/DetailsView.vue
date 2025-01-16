@@ -211,28 +211,6 @@ hr {
         margin-bottom: 15px;
         animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 
-        .add-new {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            bottom: 50px;
-            right: 70px;
-            background-color: #92FE9D;
-            height: 50px;
-            width: 50px;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-            transition: ease-in-out 150ms;
-            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-
-            &:hover {
-                transform: scale(1.1);
-            }
-        }
-
         .card {
             width: 100%;
             padding: 15px;

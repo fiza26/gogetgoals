@@ -73,7 +73,8 @@ export const useGoalsStore = defineStore('goals', () => {
         description: goalDescription.value
       })
       if (response.data) {
-        window.alert('Selected post has been updated')
+        window.alert('Selected goal has been updated')
+        location.reload()
       }
       await getAllGoals()
       editState.value = false
