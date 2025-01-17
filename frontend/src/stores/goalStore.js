@@ -1,8 +1,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 export const useGoalsStore = defineStore('goals', () => {
+  const router = useRouter()
 
   const allGoals = ref([])
   const emojis = ref(['😁', '😭', '😎', '🤖', '😽', '🤩'])
@@ -96,6 +98,7 @@ export const useGoalsStore = defineStore('goals', () => {
       })
       if (response.data) {
         window.alert('Selected goal has been deleted')
+        router.push('/')
       }
       await getAllGoals()
     } catch (error) {
