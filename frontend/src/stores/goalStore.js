@@ -41,18 +41,22 @@ export const useGoalsStore = defineStore('goals', () => {
   const newGoal = ref(null)
 
   async function addNewGoal() {
-    try {
-      const response = await axios.post('http://localhost:8000/creategoal', {
-        title: goalTitle.value,
-        description: goalDescription.value
-      })
-      newGoal.value = response.data.result
-      modalState.value = false
-      await getAllGoals()
-      goalTitle.value = ''
-      goalDescription.value = ''
-    } catch (error) {
-      console.log(error)
+    if (goalTitle.value === '' && goalDescription.value === '') {
+      window.alert('Title and description can not be empty')
+    } else {
+      try {
+        const response = await axios.post('http://localhost:8000/creategoal', {
+          title: goalTitle.value,
+          description: goalDescription.value
+        })
+        newGoal.value = response.data.result
+        modalState.value = false
+        await getAllGoals()
+        goalTitle.value = ''
+        goalDescription.value = ''
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
