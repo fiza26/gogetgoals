@@ -41,7 +41,7 @@ export const useGoalsStore = defineStore('goals', () => {
   const newGoal = ref(null)
 
   async function addNewGoal() {
-    if (goalTitle.value === '' && goalDescription.value === '') {
+    if (goalTitle.value === '' || goalDescription.value === '') {
       window.alert('Title and description can not be empty')
     } else {
       try {

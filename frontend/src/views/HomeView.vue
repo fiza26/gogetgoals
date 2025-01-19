@@ -47,7 +47,7 @@ const addNewGoal = () => goalsStore.addNewGoal()
             <span>Progress {{ goal.target_value }}</span><br>
           </div>
           <RouterLink :to='`/details/${goal.id}`'>
-            <button>Update</button>
+            <button>Details</button>
           </RouterLink>
         </div>
       </div>
@@ -267,6 +267,10 @@ hr {
   .container {
     margin-left: 50px;
     margin-right: 50px;
+  }
+
+  .container .card-container .card {
+    width: 100%;
   }
 }
 </style>

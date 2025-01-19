@@ -63,6 +63,11 @@ getGoal()
                     <div class="card-content">
                         <p>{{ goal.description }}</p>
                         <span>Progress {{ goal.target_value }}</span><br>
+                        <div class="progress-bar">
+                            <div class="progress">
+                                <p class="progress-percentage">0%</p>
+                            </div>
+                        </div>
                     </div>
                     <form class="update-progress" @submit.prevent>
                         <textarea name="" id="" placeholder="Write your progress here..."></textarea><br>
@@ -265,6 +270,24 @@ hr {
 
             .card-content {
                 margin-top: 15px;
+
+                .progress-bar {
+                    width: 100%;
+                    border: 2px solid white;
+                    border-radius: 15px;
+                    margin-top: 10px;
+
+                    .progress {
+                        border-radius: 15px;
+                        width: 50%;
+                        transition: ease-in-out 0.1s;
+                        background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+
+                        .progress-percentage {
+                            opacity: 0;
+                        }
+                    }
+                }
             }
 
             .update-progress {
