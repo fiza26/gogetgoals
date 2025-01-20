@@ -35,10 +35,12 @@ const addNewGoal = () => goalsStore.addNewGoal()
         <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id">
           <div class="card-header">
             <h3>{{ goal.emoji }} {{ goal.title }}</h3>
-            <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
-            <div class="card-header-options" v-if="goal.optionsState">
-              <span class="edit-goal" @click="changeEditState(goal)"><i class="fa-solid fa-pen-to-square"></i></span>
-              <span class="delete-goal" @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
+            <div class="options-wrapper">
+              <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
+              <div class="card-header-options" v-if="goal.optionsState">
+                <span class="edit-goal" @click="changeEditState(goal)"><i class="fa-solid fa-pen-to-square"></i></span>
+                <span class="delete-goal" @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
+              </div>
             </div>
           </div>
           <hr>
@@ -180,6 +182,13 @@ hr {
         align-items: center;
         margin-bottom: 10px;
         cursor: pointer;
+
+        .options-wrapper {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          width: 100px;
+        }
 
         .options {
           margin-left: 10px;
