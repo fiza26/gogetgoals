@@ -65,7 +65,7 @@ getGoal()
                         <span>Progress {{ goal.target_value }}</span><br>
                         <div class="progress-bar">
                             <div class="progress">
-                                <p class="progress-percentage">0%</p>
+                                <p class="progress-percentage">50%</p>
                             </div>
                         </div>
                     </div>
@@ -284,7 +284,8 @@ hr {
                         background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
 
                         .progress-percentage {
-                            opacity: 0;
+                            text-align: center;
+                            color: white;
                         }
                     }
                 }
