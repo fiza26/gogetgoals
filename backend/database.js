@@ -42,11 +42,14 @@ export async function deleteGoal(id) {
     return rows
 }
 
-// const goals = await getGoals()
-// console.log(goals)
+// Get user progress
+export async function getUserProgress(id) {
+    const [rows] = await pool.query(`SELECT * FROM user_progress WHERE id_goal = ?`, [id])
+    return rows
+}
 
-// const goals = await createGoal('Belajar koding selama 30 hari', 'Saya akan belajar koding selama 30 hari', 0)
-// console.log(goals)
-
-// const goal = await getGoal(1)
-// console.log(goal)
+// Create a user progress
+export async function createProgress(id_goal, progress, ai_response, progress_percentage) {
+    const [rows] = await pool.query(`INSERT INTO user_progress (id_goal, progress, ai_response, progress_percentage) VALUES (?, ?, ?, ?)`, [id_goal, progress, ai_response, progress_percentage])
+    return rows
+}

@@ -27,6 +27,38 @@ async function getGoal() {
 }
 getGoal()
 
+const allProgress = ref([])
+
+async function getUserProgress() {
+    try {
+        const response = await axios.get(`http://localhost:8000/getuserprogress/${id.value}`)
+        allProgress.value = response.data.result
+        console.log('All user progress', allProgress.value)
+    } catch (error) {
+        console.log(error)
+    }
+}
+getUserProgress()
+
+const progress = ref('')
+const newUserProgress = ref(null)
+
+async function createUserProgress() {
+    try {
+        const response = await axios.post(`http://localhost:8000/createprogress`, {
+            id_goal: id.value,
+            progress: progress.value,
+            ai_response: 'AI response example',
+            progress_percentage: 50
+        })
+        newUserProgress.value = response.data.result
+        console.log('User Progress:', newUserProgress)
+        window.alert('New progress created')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 </script>
 
 <template>
@@ -70,26 +102,22 @@ getGoal()
                         </div>
                     </div>
                     <form class="update-progress" @submit.prevent>
-                        <textarea name="" id="" placeholder="Write your progress here..."></textarea><br>
-                        <button>Update</button>
+                        <textarea name="" id="" placeholder="Write your progress here..."
+                            v-model="progress"></textarea><br>
+                        <button @click="createUserProgress()">Update</button>
                     </form>
                 </div>
-                <div class="card-progress">
+                <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
                     <div class="card-progress-header">
-                        {{ goal[0].created }}
+                        {{ progress.progress_created }}
                     </div>
                     <div class="card-progress-content">
                         <div class="user-progress">
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga deserunt architecto nulla
-                                qui
-                                placeat? Accusantium aspernatur alias ab numquam quod!</p>
+                            <p>{{ progress.progress }}</p>
                         </div>
                         <hr>
                         <div class="ai-response">
-                            <p><i class="fa-solid fa-star"></i> AI Assistant: Lorem ipsum dolor sit amet consectetur
-                                adipisicing elit. Accusantium cum perspiciatis
-                                repellat ullam tenetur ab ut ipsa, quaerat unde minima dolores exercitationem distinctio
-                                non doloremque adipisci voluptatibus facilis nostrum accusamus?</p>
+                            <p><i class="fa-solid fa-star"></i> AI Assistant: {{ progress.ai_response }}</p>
                         </div>
                     </div>
                 </div>

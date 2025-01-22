@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { getGoals, getGoal, createGoal, editGoal, deleteGoal } from './database.js'
+import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress } from './database.js'
 
 const app = express()
 app.use(cors());
@@ -38,7 +38,7 @@ app.post('/creategoal', async (req, res) => {
 // Update goal
 app.post('/editgoal', async (req, res) => {
     try {
-        const { id, title, description } = req.body 
+        const { id, title, description } = req.body
         await editGoal(id, title, description)
         res.status(200).json({ message: 'Goal updated succesfuly' })
     } catch (error) {
@@ -56,6 +56,29 @@ app.post('/deletegoal', async (req, res) => {
     } catch (error) {
         console.log('Error deleting goal', error)
         res.status(500).json({ error: 'An error occured while deleting a goal' })
+    }
+})
+
+// Get user progress
+app.get('/getuserprogress/:id', async (req, res) => {
+    try {
+        const id = req.params.id
+        const progress = await getUserProgress(id)
+        res.json({ result: progress })
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+// Create user progress
+app.post('/createprogress', async (req, res) => {
+    try {
+        const { id_goal, progress, ai_response, progress_percentage } = req.body
+        const userProgress = await createProgress(id_goal, progress, ai_response, progress_percentage)
+        res.json({ result: userProgress })
+    } catch (error) {
+        console.log('Error creating user progress', error)
+        res.status(500).json({ error: 'An error occured while creating user progress' })
     }
 })
 
