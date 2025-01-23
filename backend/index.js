@@ -40,7 +40,7 @@ app.post('/editgoal', async (req, res) => {
     try {
         const { id, title, description } = req.body
         await editGoal(id, title, description)
-        res.status(200).json({ message: 'Goal updated succesfuly' })
+        res.status(200).json({ message: 'Goal updated succesfully' })
     } catch (error) {
         console.log('Error updating goal', error)
         res.status(500).json({ error: 'An error occured' })

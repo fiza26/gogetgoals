@@ -7,6 +7,7 @@ import { useGoalsStore } from '@/stores/goalStore'
 const goalsStore = useGoalsStore()
 
 const showOptions = (goal) => goalsStore.showOptions(goal)
+const addNewGoal = () => goalsStore.addNewGoal()
 const changeEditState = (goal) => goalsStore.changeEditState(goal)
 const editGoal = () => goalsStore.editGoal()
 const closeModal = () => goalsStore.closeModal()
@@ -54,6 +55,7 @@ async function createUserProgress() {
         newUserProgress.value = response.data.result
         console.log('User Progress:', newUserProgress)
         window.alert('New progress created')
+        location.reload()
     } catch (error) {
         console.log(error)
     }
@@ -233,7 +235,7 @@ hr {
     margin-right: 80px;
 
     .card-container {
-        max-width: 40rem;
+        width: 40rem;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;

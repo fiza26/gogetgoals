@@ -51,6 +51,7 @@ export const useGoalsStore = defineStore('goals', () => {
         })
         newGoal.value = response.data.result
         modalState.value = false
+        window.alert('New goal created successfully')
         await getAllGoals()
         goalTitle.value = ''
         goalDescription.value = ''
