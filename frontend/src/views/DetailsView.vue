@@ -45,19 +45,23 @@ const progress = ref('')
 const newUserProgress = ref(null)
 
 async function createUserProgress() {
-    try {
-        const response = await axios.post(`http://localhost:8000/createprogress`, {
-            id_goal: id.value,
-            progress: progress.value,
-            ai_response: 'AI response example',
-            progress_percentage: 50
-        })
-        newUserProgress.value = response.data.result
-        console.log('User Progress:', newUserProgress)
-        window.alert('New progress created')
-        location.reload()
-    } catch (error) {
-        console.log(error)
+    if (progress.value === '') {
+        window.alert('Progress can not be empty')
+    } else {
+        try {
+            const response = await axios.post(`http://localhost:8000/createprogress`, {
+                id_goal: id.value,
+                progress: progress.value,
+                ai_response: 'AI response example',
+                progress_percentage: 50
+            })
+            newUserProgress.value = response.data.result
+            console.log('User Progress:', newUserProgress)
+            window.alert('New progress created')
+            location.reload()
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 
