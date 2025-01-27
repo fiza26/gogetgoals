@@ -115,7 +115,15 @@ async function createUserProgress() {
                 </div>
                 <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
                     <div class="card-progress-header">
-                        {{ progress.progress_created }}
+                        <div class="card-progress-date">
+                            {{ progress.progress_created }}
+                        </div>
+
+                        <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
+                        <div class="card-header-options" v-if="goal.optionsState">
+                            <span class="delete-goal" @click="deleteGoal(goal)"><i
+                                    class="fa-solid fa-delete-left"></i></span>
+                        </div>
                     </div>
                     <div class="card-progress-content">
                         <div class="user-progress">
@@ -369,11 +377,19 @@ hr {
             transition: ease-in-out 150ms;
 
             .card-progress-header {
-                color: white;
-                border-radius: 15px;
-                padding: 5px;
-                text-align: center;
-                background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .card-progress-date {
+                    color: white;
+                    border-radius: 15px;
+                    padding: 5px;
+                    width: 50%;
+                    text-align: center;
+                    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+                }
+
             }
 
             .card-progress-content {
