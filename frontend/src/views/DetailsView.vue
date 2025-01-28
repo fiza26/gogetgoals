@@ -68,6 +68,20 @@ async function createUserProgress() {
     }
 }
 
+async function deleteUserProgress(progress) {
+    try {
+        const response = await axios.post(`http://localhost:8000/deleteprogress`, {
+            id: progress.id
+        })
+        if (response) {
+            window.alert('User progress deleted')
+        }
+        await getUserProgress()
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 </script>
 
 <template>
@@ -123,7 +137,7 @@ async function createUserProgress() {
                         </div>
                         <span class="options" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-header-options" v-if="progress.optionsState">
-                            <span class="delete-goal" @click="deleteGoal(goal)"><i
+                            <span class="delete-goal" @click="deleteUserProgress(progress)"><i
                                     class="fa-solid fa-delete-left"></i></span>
                         </div>
                     </div>
