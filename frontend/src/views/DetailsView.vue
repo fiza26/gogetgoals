@@ -33,7 +33,10 @@ const allProgress = ref([])
 async function getUserProgress() {
     try {
         const response = await axios.get(`http://localhost:8000/getuserprogress/${id.value}`)
-        allProgress.value = response.data.result
+        allProgress.value = response.data.result.map(progress => ({
+            ...progress,
+            optionState: false
+        }))
         console.log('All user progress', allProgress.value)
     } catch (error) {
         console.log(error)
@@ -118,9 +121,8 @@ async function createUserProgress() {
                         <div class="card-progress-date">
                             {{ progress.progress_created }}
                         </div>
-
-                        <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
-                        <div class="card-header-options" v-if="goal.optionsState">
+                        <span class="options" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
+                        <div class="card-header-options" v-if="progress.optionsState">
                             <span class="delete-goal" @click="deleteGoal(goal)"><i
                                     class="fa-solid fa-delete-left"></i></span>
                         </div>

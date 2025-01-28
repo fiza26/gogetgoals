@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress } from './database.js'
+import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress, deleteProgress } from './database.js'
 
 const app = express()
 app.use(cors());
@@ -79,6 +79,16 @@ app.post('/createprogress', async (req, res) => {
     } catch (error) {
         console.log('Error creating user progress', error)
         res.status(500).json({ error: 'An error occured while creating user progress' })
+    }
+})
+
+app.post('/deleteprogress', async (req, res) => {
+    try {
+        const { id } = req.body
+        await deleteProgress(id)
+        res.status(200).json({ message: 'User progress deleted successfully' })
+    } catch (error) {
+        res.status(500).json({ error: 'An error occured while deleting user progress' })
     }
 })
 

@@ -53,3 +53,9 @@ export async function createProgress(id_goal, progress, ai_response, progress_pe
     const [rows] = await pool.query(`INSERT INTO user_progress (id_goal, progress, ai_response, progress_percentage) VALUES (?, ?, ?, ?)`, [id_goal, progress, ai_response, progress_percentage])
     return rows
 }
+
+// Delete user progress
+export async function deleteProgress(id) {
+    const [rows] = await pool.query('DELETE from user_progress WHERE id = ?', [id])
+    return rows
+}
