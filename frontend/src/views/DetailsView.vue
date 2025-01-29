@@ -406,6 +406,16 @@ hr {
                     background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
                 }
 
+                .options {
+                    margin-left: 10px;
+                    cursor: pointer;
+                    transition: ease-in-out 150ms;
+
+                    &:hover {
+                        transform: scale(1.1);
+                    }
+                }
+
             }
 
             .card-progress-content {
