@@ -136,8 +136,8 @@ async function deleteUserProgress(progress) {
                             {{ progress.progress_created }}
                         </div>
                         <span class="options" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
-                        <div class="card-header-options" v-if="progress.optionsState">
-                            <span class="delete-goal" @click="deleteUserProgress(progress)"><i
+                        <div class="card-progress-options" v-if="progress.optionsState">
+                            <span class="delete-progress" @click="deleteUserProgress(progress)"><i
                                     class="fa-solid fa-delete-left"></i></span>
                         </div>
                     </div>
@@ -413,6 +413,19 @@ hr {
 
                     &:hover {
                         transform: scale(1.1);
+                    }
+                }
+
+                .card-progress-options {
+                    cursor: pointer;
+                    animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+
+                    .delete-progress {
+                        transition: ease-in-out 150ms;
+
+                        &:hover {
+                            transform: scale(1.1);
+                        }
                     }
                 }
 
