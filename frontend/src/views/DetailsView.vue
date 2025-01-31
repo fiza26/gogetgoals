@@ -437,6 +437,8 @@ hr {
 
                 .user-progress {
                     margin-bottom: 15px;
+                    white-space: pre;
+                    word-wrap: break-word;
                 }
 
                 .ai-response {
