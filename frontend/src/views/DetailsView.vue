@@ -401,7 +401,7 @@ hr {
                     color: white;
                     border-radius: 15px;
                     padding: 5px;
-                    width: 50%;
+                    width: 100%;
                     text-align: center;
                     background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
                 }
@@ -417,6 +417,7 @@ hr {
                 }
 
                 .card-progress-options {
+                    margin-left: 15px;
                     cursor: pointer;
                     animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 
