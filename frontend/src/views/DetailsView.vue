@@ -117,7 +117,7 @@ async function deleteUserProgress(progress) {
                     <hr>
                     <div class="card-content">
                         <p>{{ goal.description }}</p>
-                        <span>Progress {{ goal.target_value }}</span><br>
+                        <br>
                         <div class="progress-bar">
                             <div class="progress">
                                 <p class="progress-percentage">50%</p>
