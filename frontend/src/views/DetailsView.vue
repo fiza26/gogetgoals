@@ -133,7 +133,7 @@ async function deleteUserProgress(progress) {
                 <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
                     <div class="card-progress-header">
                         <div class="card-progress-date">
-                            {{ progress.progress_created }}
+                            {{ new Date(progress.progress_created).toLocaleString() }}
                         </div>
                         <span class="options" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-progress-options" v-if="progress.optionsState">
