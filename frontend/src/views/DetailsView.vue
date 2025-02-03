@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { useGoalsStore } from '@/stores/goalStore'
@@ -16,7 +16,7 @@ const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 const route = useRoute()
 const id = computed(() => route.params.id)
 
-const goal = ref(null)
+const goal = ref({})
 
 async function getGoal() {
     try {
@@ -45,23 +45,49 @@ async function getUserProgress() {
 getUserProgress()
 
 const progress = ref('')
+const aiResponse = ref('')
 const newUserProgress = ref(null)
 
-async function createUserProgress() {
+async function createUserProgress(goal) {
     if (progress.value === '') {
         window.alert('Progress can not be empty')
     } else {
         try {
-            const response = await axios.post(`http://localhost:8000/createprogress`, {
+            // const progressHistory = allProgress.value.length > 0 ? allProgress.value : [];
+
+            const progressHistory = allProgress.value.length > 0 ? allProgress.value : []; // Get latest progress if available
+
+            const geminiResponse = await axios.post(`http://localhost:3000/gemini`, {
                 id_goal: id.value,
-                progress: progress.value,
-                ai_response: 'AI response example',
-                progress_percentage: 50
+                goalTitle: goal.title,
+                goalDescription: goal.description,
+                // progressIdGoal: latestProgress.id_goal || null,
+                // progressText: latestProgress.progress || '',
+                // progressAiResponse: latestProgress.ai_response || '',
+                // progressCreated: latestProgress.created || '',
+                progressHistory: progressHistory.map(entry => ({
+                    id_goal: entry.id_goal,
+                    progressText: entry.progress,
+                    progressAiResponse: entry.ai_response,
+                    progressCreated: entry.created
+                })),
+                progress: progress.value
             })
-            newUserProgress.value = response.data.result
-            console.log('User Progress:', newUserProgress)
-            window.alert('New progress created')
-            location.reload()
+            aiResponse.value = geminiResponse.data.result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
+            console.log('Response:', aiResponse)
+
+            if (aiResponse.value) {
+                const response = await axios.post(`http://localhost:8000/createprogress`, {
+                    id_goal: id.value,
+                    progress: progress.value,
+                    ai_response: aiResponse.value,
+                    progress_percentage: 50
+                })
+                newUserProgress.value = response.data.result
+                console.log('User Progress:', newUserProgress)
+                window.alert('New progress created')
+                location.reload()
+            }
         } catch (error) {
             console.log(error)
         }
@@ -124,10 +150,11 @@ async function deleteUserProgress(progress) {
                             </div>
                         </div>
                     </div>
+
                     <form class="update-progress" @submit.prevent>
                         <textarea name="" id="" placeholder="Write your progress here..."
                             v-model="progress"></textarea><br>
-                        <button @click="createUserProgress()">Update</button>
+                        <button @click="createUserProgress(goal)">Update</button>
                     </form>
                 </div>
                 <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
@@ -263,7 +290,8 @@ hr {
     margin-right: 80px;
 
     .card-container {
-        width: 40rem;
+        width: 100%;
+        max-width: 40rem;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -359,6 +387,7 @@ hr {
                     height: 5rem;
                     padding: 10px;
                     border: none;
+                    resize: vertical;
                 }
             }
 
@@ -391,6 +420,7 @@ hr {
             background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             transition: ease-in-out 150ms;
+            // box-sizing: border-box;
 
             .card-progress-header {
                 display: flex;
@@ -437,7 +467,6 @@ hr {
 
                 .user-progress {
                     margin-bottom: 15px;
-                    white-space: pre;
                     word-wrap: break-word;
                 }
 
