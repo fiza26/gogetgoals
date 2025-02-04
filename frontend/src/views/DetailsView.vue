@@ -53,18 +53,12 @@ async function createUserProgress(goal) {
         window.alert('Progress can not be empty')
     } else {
         try {
-            // const progressHistory = allProgress.value.length > 0 ? allProgress.value : [];
-
             const progressHistory = allProgress.value.length > 0 ? allProgress.value : []; // Get latest progress if available
 
             const geminiResponse = await axios.post(`http://localhost:3000/gemini`, {
                 id_goal: id.value,
                 goalTitle: goal.title,
                 goalDescription: goal.description,
-                // progressIdGoal: latestProgress.id_goal || null,
-                // progressText: latestProgress.progress || '',
-                // progressAiResponse: latestProgress.ai_response || '',
-                // progressCreated: latestProgress.created || '',
                 progressHistory: progressHistory.map(entry => ({
                     id_goal: entry.id_goal,
                     progressText: entry.progress,
