@@ -46,6 +46,7 @@ getUserProgress()
 
 const progress = ref('')
 const aiResponse = ref('')
+const percentage = ref('')
 const newUserProgress = ref(null)
 
 async function createUserProgress(goal) {
@@ -53,7 +54,7 @@ async function createUserProgress(goal) {
         window.alert('Progress can not be empty')
     } else {
         try {
-            const progressHistory = allProgress.value.length > 0 ? allProgress.value : []; // Get latest progress if available
+            const progressHistory = allProgress.value.length > 0 ? allProgress.value : [];
 
             const geminiResponse = await axios.post(`http://localhost:3000/gemini`, {
                 id_goal: id.value,
@@ -70,14 +71,18 @@ async function createUserProgress(goal) {
             aiResponse.value = geminiResponse.data.result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
             console.log('Response:', aiResponse)
 
+            percentage.value = geminiResponse.data.percentage
+            console.log('Gemini Response:', geminiResponse.data.percentage);
+
             if (aiResponse.value) {
                 const response = await axios.post(`http://localhost:8000/createprogress`, {
                     id_goal: id.value,
                     progress: progress.value,
                     ai_response: aiResponse.value,
-                    progress_percentage: 50
+                    progress_percentage: percentage.value
                 })
                 newUserProgress.value = response.data.result
+                await updateGoalPercentage()
                 console.log('User Progress:', newUserProgress)
                 window.alert('New progress created')
                 location.reload()
@@ -87,6 +92,25 @@ async function createUserProgress(goal) {
         }
     }
 }
+
+async function updateGoalPercentage() {
+    try {
+        const response = await axios.post(`http://localhost:8000/updatepercentage`, {
+            id_goal: id.value,
+            percentage: percentage.value
+        })
+        if (response) {
+            window.alert('Goal percentage has been updated', percentage)
+            // updateProgressBar()
+        }
+    } catch (error) {
+        console.log('Error :', error)
+    }
+}
+
+// function updateProgressBar() {
+//     document.querySelector('.progress').style.width = percentage.value + '%'
+// }
 
 async function deleteUserProgress(progress) {
     try {
@@ -139,8 +163,8 @@ async function deleteUserProgress(progress) {
                         <p>{{ goal.description }}</p>
                         <br>
                         <div class="progress-bar">
-                            <div class="progress">
-                                <p class="progress-percentage">50%</p>
+                            <div class="progress" :style="{ width: goal.percentage + '%' }">
+                                <p class="progress-percentage">{{ goal.percentage }}%</p>
                             </div>
                         </div>
                     </div>
@@ -165,6 +189,7 @@ async function deleteUserProgress(progress) {
                     <div class="card-progress-content">
                         <div class="user-progress">
                             <p>{{ progress.progress }}</p>
+                            <p>Progress : {{ progress.progress_percentage }}%</p>
                         </div>
                         <hr>
                         <div class="ai-response">

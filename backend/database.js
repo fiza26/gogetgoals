@@ -59,3 +59,9 @@ export async function deleteProgress(id) {
     const [rows] = await pool.query('DELETE from user_progress WHERE id = ?', [id])
     return rows
 }
+
+// Update goal percentage
+export async function updatePercentage(percentage, id_goal) {
+    const [rows] = await pool.query('UPDATE goals SET percentage = ? WHERE id = ?', [percentage, id_goal])
+    return rows
+}
