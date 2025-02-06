@@ -84,8 +84,7 @@ async function createUserProgress(goal) {
                 newUserProgress.value = response.data.result
                 await updateGoalPercentage()
                 console.log('User Progress:', newUserProgress)
-                window.alert('New progress created')
-                location.reload()
+                await getUserProgress()
             }
         } catch (error) {
             console.log(error)
@@ -100,17 +99,12 @@ async function updateGoalPercentage() {
             percentage: percentage.value
         })
         if (response) {
-            window.alert('Goal percentage has been updated', percentage)
-            // updateProgressBar()
+            await getGoal()
         }
     } catch (error) {
         console.log('Error :', error)
     }
 }
-
-// function updateProgressBar() {
-//     document.querySelector('.progress').style.width = percentage.value + '%'
-// }
 
 async function deleteUserProgress(progress) {
     try {
@@ -384,7 +378,7 @@ hr {
 
                     .progress {
                         border-radius: 15px;
-                        width: 50%;
+                        width: 0%;
                         transition: ease-in-out 0.1s;
                         background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
 
@@ -439,7 +433,6 @@ hr {
             background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             transition: ease-in-out 150ms;
-            // box-sizing: border-box;
 
             .card-progress-header {
                 display: flex;
