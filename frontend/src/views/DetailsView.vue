@@ -154,6 +154,8 @@ async function deleteUserProgress(progress) {
                     </div>
                     <hr>
                     <div class="card-content">
+                        <p class="goal-completed" v-if="goal.percentage === '100'"><i class="fa-solid fa-check"></i> This goal is completed
+                        </p>
                         <p>{{ goal.description }}</p>
                         <br>
                         <div class="progress-bar">
@@ -164,9 +166,9 @@ async function deleteUserProgress(progress) {
                     </div>
 
                     <form class="update-progress" @submit.prevent>
-                        <textarea name="" id="" placeholder="Write your progress here..."
-                            v-model="progress"></textarea><br>
-                        <button @click="createUserProgress(goal)">Update</button>
+                        <textarea v-if="!goal.percentage === '100'" name="" id=""
+                            placeholder="Write your progress here..." v-model="progress"></textarea><br>
+                        <button @click="createUserProgress(goal)" v-if="!goal.percentage === '100'">Update</button>
                     </form>
                 </div>
                 <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
@@ -369,6 +371,16 @@ hr {
 
             .card-content {
                 margin-top: 15px;
+
+                .goal-completed {
+                    background-color: #92FE9D;
+                    color: white;
+                    padding: 10px;
+                    width: 100%;
+                    border-radius: 15px;
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
 
                 .progress-bar {
                     width: 100%;
