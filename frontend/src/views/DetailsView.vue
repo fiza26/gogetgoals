@@ -154,7 +154,8 @@ async function deleteUserProgress(progress) {
                     </div>
                     <hr>
                     <div class="card-content">
-                        <p class="goal-completed" v-if="goal.percentage === '100'"><i class="fa-solid fa-check"></i> This goal is completed
+                        <p class="goal-completed" v-if="goal.percentage === '100'"><i class="fa-solid fa-check"></i>
+                            This goal is completed
                         </p>
                         <p>{{ goal.description }}</p>
                         <br>
@@ -166,15 +167,16 @@ async function deleteUserProgress(progress) {
                     </div>
 
                     <form class="update-progress" @submit.prevent>
-                        <textarea v-if="!goal.percentage === '100'" name="" id=""
+                        <textarea v-if="goal.percentage != '100'" name="" id=""
                             placeholder="Write your progress here..." v-model="progress"></textarea><br>
-                        <button @click="createUserProgress(goal)" v-if="!goal.percentage === '100'">Update</button>
+                        <button v-if="goal.percentage != '100'" @click="createUserProgress(goal)">Update</button>
                     </form>
                 </div>
                 <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
                     <div class="card-progress-header">
                         <div class="card-progress-date">
-                            <i class="fa-solid fa-calendar-days"></i> {{ new Date(progress.progress_created).toLocaleString() }}
+                            <i class="fa-solid fa-calendar-days"></i> {{ new
+                                Date(progress.progress_created).toLocaleString() }}
                         </div>
                         <span class="options" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-progress-options" v-if="progress.optionsState">
