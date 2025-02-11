@@ -11,8 +11,9 @@ import { ref } from 'vue'
                     <input type="text" placeholder="Enter username"><br>
                     <label for=""><i class="fa-solid fa-lock"></i> Password</label><br><br>
                     <input type="password" placeholder="Enter password"><br>
-                    <button type="submit">Login</button>
-                </form>
+                    <button type="submit">LOGIN <i class="fa-solid fa-arrow-right"></i></button>
+                </form><br>
+                <p class="sign-up">Sign-Up here</p>
             </div>
         </div>
     </main>
@@ -33,20 +34,14 @@ import { ref } from 'vue'
     margin-right: 80px;
 
     .login-card {
-        // display: flex;
-        // justify-content: center;
-        // align-items: center;
+        padding: 25px;
         width: 400px;
-        height: 400px;
+        height: 390px;
         border-radius: 15px;
         box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
 
         form {
-            margin-top: 50px;
-            padding: 15px;
-            
-            // background-color: yellow;
 
             input {
                 font-family: 'Poppins', sans-serif;
@@ -55,6 +50,11 @@ import { ref } from 'vue'
                 border-radius: 15px;
                 border: none;
                 margin-bottom: 20px;
+                transition: ease-in-out 0.3s;
+
+                &:hover {
+                    border: 1px solid #92FE9D;
+                }
             }
 
             button {
@@ -66,8 +66,19 @@ import { ref } from 'vue'
                 margin-top: 15px;
                 color: white;
                 cursor: pointer;
+                transition: ease-in-out 150ms;
                 background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+
+                &:hover {
+                    transform: scale(1.030);
+                }
             }
+        }
+        .sign-up {
+            text-align: center;
+            text-decoration: underline;
+            cursor: pointer;
         }
     }
 }
