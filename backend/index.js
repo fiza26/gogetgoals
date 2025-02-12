@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress, deleteProgress, updatePercentage } from './database.js'
+import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress, deleteProgress, updatePercentage, login } from './database.js'
 
 const app = express()
 app.use(cors());
@@ -101,6 +101,26 @@ app.post('/updatepercentage', async (req, res) => {
         res.status(500).json({ error: 'An error occured while updating goal percentage' })
     }
 })
+
+app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await login(username, password);
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid username or password' });
+        }
+
+        res.status(200).json({ success: true, message: 'Login success', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'An error occurred while logging in' });
+    }
+});
+
+
+
+
 
 app.listen(8000, () => {
     console.log("Listening to port 8000")

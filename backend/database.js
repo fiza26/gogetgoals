@@ -65,3 +65,23 @@ export async function updatePercentage(percentage, id_goal) {
     const [rows] = await pool.query('UPDATE goals SET percentage = ? WHERE id = ?', [percentage, id_goal])
     return rows
 }
+
+// User login
+export async function login(username, password) {
+    const [rows] = await pool.query(
+        'SELECT id, username, password FROM users WHERE username = ?', 
+        [username]
+    );
+
+    if (rows.length === 0) {
+        return null; // User not found
+    }
+
+    const user = rows[0];
+
+    if (password !== user.password) {
+        return null; // Wrong password
+    }
+
+    return user; // Login successful
+}

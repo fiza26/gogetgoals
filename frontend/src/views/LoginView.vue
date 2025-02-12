@@ -1,17 +1,46 @@
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
+
+
+const username = ref('')
+const password = ref('')
+
+async function login() {
+    try {
+        const response = await axios.post('http://localhost:8000/login', {
+            username: username.value,
+            password: password.value
+        });
+
+        console.log(response.data);
+
+        window.alert(response.data.message); // Show message from backend
+    } catch (error) {
+        if (error.response) {
+            // The server responded with a non-2xx status code
+            window.alert(error.response.data.message || 'An error occurred');
+        } else {
+            // Other network or client-side errors
+            console.log(error);
+            window.alert('An error occurred while logging in');
+        }
+    }
+}
+
+
 </script>
 
 <template>
     <main>
         <div class="card-container">
             <div class="login-card">
-                <form>
+                <form @submit.prevent>
                     <label for=""><i class="fa-solid fa-user"></i> Username</label><br><br>
-                    <input type="text" placeholder="Enter username"><br>
+                    <input type="text" placeholder="Enter username" v-model="username"><br>
                     <label for=""><i class="fa-solid fa-lock"></i> Password</label><br><br>
-                    <input type="password" placeholder="Enter password"><br>
-                    <button type="submit">LOGIN <i class="fa-solid fa-arrow-right"></i></button>
+                    <input type="password" placeholder="Enter password" v-model="password"><br>
+                    <button type="submit" @click="login()">LOGIN <i class="fa-solid fa-arrow-right"></i></button>
                 </form><br>
                 <p class="sign-up">Sign-Up here</p>
             </div>
@@ -75,6 +104,7 @@ import { ref } from 'vue'
                 }
             }
         }
+
         .sign-up {
             text-align: center;
             text-decoration: underline;
