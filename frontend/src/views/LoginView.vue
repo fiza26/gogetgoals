@@ -1,10 +1,23 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
 
+const authStore = useAuthStore()
+
+const router = useRouter()
 
 const username = ref('')
 const password = ref('')
+
+const userSession = ref(false)
+
+onMounted(() => {
+    if (authStore.userSession) {
+        router.push({ name: 'home' })
+    }
+})
 
 async function login() {
     try {
@@ -13,13 +26,17 @@ async function login() {
             password: password.value
         });
 
-        console.log(response.data);
-
+        console.log(response.data)
+        userSession.value = true
+        authStore.setUserSession(true)
         window.alert(response.data.message); // Show message from backend
+        router.push('/')
     } catch (error) {
         if (error.response) {
             // The server responded with a non-2xx status code
             window.alert(error.response.data.message || 'An error occurred');
+            username.value = ''
+            password.value = ''
         } else {
             // Other network or client-side errors
             console.log(error);
@@ -27,7 +44,6 @@ async function login() {
         }
     }
 }
-
 
 </script>
 
@@ -37,9 +53,9 @@ async function login() {
             <div class="login-card">
                 <form @submit.prevent>
                     <label for=""><i class="fa-solid fa-user"></i> Username</label><br><br>
-                    <input type="text" placeholder="Enter username" v-model="username"><br>
+                    <input type="text" placeholder="Enter username" v-model="username" required><br>
                     <label for=""><i class="fa-solid fa-lock"></i> Password</label><br><br>
-                    <input type="password" placeholder="Enter password" v-model="password"><br>
+                    <input type="password" placeholder="Enter password" v-model="password" required><br>
                     <button type="submit" @click="login()">LOGIN <i class="fa-solid fa-arrow-right"></i></button>
                 </form><br>
                 <p class="sign-up">Sign-Up here</p>

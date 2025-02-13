@@ -1,6 +1,10 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useGoalsStore } from '@/stores/goalStore'
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore()
 
 const goalsStore = useGoalsStore()
 
@@ -10,6 +14,15 @@ const editGoal = () => goalsStore.editGoal()
 const closeModal = () => goalsStore.closeModal()
 const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 const addNewGoal = () => goalsStore.addNewGoal()
+
+const route = useRoute()
+const router = useRouter()
+
+onMounted(() => {
+  if (!authStore.userSession) {
+    router.push({ name: 'login' })
+  }
+})
 
 </script>
 
