@@ -1,7 +1,9 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRouter, useRoute } from 'vue-router'
 import { useGoalsStore } from '@/stores/goalStore'
 import { useAuthStore } from './stores/authStore';
+
+const route = useRoute()
 
 const authStore = useAuthStore()
 
@@ -14,10 +16,11 @@ const addNew = () => goalsStore.addNew()
 <template>
   <header>
     <nav>
-      <RouterLink to="/"><span><i class="fa-solid fa-house"></i></span></RouterLink>
-      <span @click="authStore.logout()"><i class="fa-solid fa-right-from-bracket"></i></span>
+      <RouterLink to="/" v-if="route.name != 'login'"><span><i class="fa-solid fa-house"></i></span></RouterLink>
+      <span @click="authStore.logout()" v-if="route.name != 'login'"><i
+          class="fa-solid fa-right-from-bracket"></i></span>
     </nav>
-    <div class="add-new" @click="addNew"><i class="fa-solid fa-plus"></i></div>
+    <div class="add-new" @click="addNew" v-if="route.name != 'login'"><i class="fa-solid fa-plus"></i></div>
   </header>
 
   <RouterView />

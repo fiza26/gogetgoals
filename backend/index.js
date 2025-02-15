@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress, deleteProgress, updatePercentage, login } from './database.js'
+import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress, deleteProgress, updatePercentage, login, signup } from './database.js'
 
 const app = express()
 app.use(cors());
@@ -117,6 +117,27 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ success: false, message: 'An error occurred while logging in' });
     }
 });
+
+app.post('/signup', async (req, res) => {
+    try {
+        const { name, username, password } = req.body
+
+        if (!name || !username || !password) {
+            return res.status(400).json({ success: false, message: 'All fields are required' })
+        }
+
+        const user = await signup(name, username, password)
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Signup failed. Username may already exist' })
+        }
+
+        res.status(200).json({ success: true, message: 'Signup success' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'An error occured while signing up' })
+    }
+})
 
 
 

@@ -69,7 +69,7 @@ export async function updatePercentage(percentage, id_goal) {
 // User login
 export async function login(username, password) {
     const [rows] = await pool.query(
-        'SELECT id, username, password FROM users WHERE username = ?', 
+        'SELECT id, username, password FROM users WHERE username = ?',
         [username]
     );
 
@@ -84,4 +84,10 @@ export async function login(username, password) {
     }
 
     return user; // Login successful
+}
+
+// User signup
+export async function signup(name, username, password) {
+    const [rows] = await pool.query('INSERT INTO users (name, username, password) VALUES (?, ?, ?)', [name, username, password]);
+    return rows
 }
