@@ -102,7 +102,7 @@ async function userSignup() {
                     <input type="password" placeholder="Enter password" v-model="password" required><br>
                     <button type="submit" @click="userSignup()">Sign-Up <i class="fa-solid fa-arrow-right"></i></button>
                 </form><br>
-                <p class="sign-up" @click="signup()">Login here</p>
+                <p class="login" @click="signup()">Login here</p>
             </div>
         </div>
     </main>
@@ -215,7 +215,7 @@ async function userSignup() {
             }
         }
 
-        .sign-up {
+        .login {
             text-align: center;
             text-decoration: underline;
             cursor: pointer;
