@@ -55,6 +55,7 @@ export const useGoalsStore = defineStore('goals', () => {
         await getAllGoals()
         goalTitle.value = ''
         goalDescription.value = ''
+        router.push('/')
       } catch (error) {
         console.log(error)
       }
