@@ -30,7 +30,7 @@ async function login() {
         console.log(response.data)
         userSession.value = true
         authStore.setUserSession(true)
-        window.alert(response.data.message); // Show message from backend
+        // window.alert(response.data.message)
         router.push('/')
     } catch (error) {
         if (error.response) {
