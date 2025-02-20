@@ -17,6 +17,7 @@ const addNew = () => goalsStore.addNew()
   <header>
     <nav>
       <RouterLink to="/" v-if="route.name != 'login'"><span><i class="fa-solid fa-house"></i></span></RouterLink>
+      <RouterLink to="/profile" v-if="route.name != 'login'"><span><i class="fa-solid fa-user"></i></span></RouterLink>
       <span @click="authStore.logout()" v-if="route.name != 'login'"><i
           class="fa-solid fa-right-from-bracket"></i></span>
     </nav>
