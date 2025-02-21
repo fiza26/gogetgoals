@@ -53,14 +53,27 @@
     }
 }
 
-@media screen and (max-width: 768px) {
-  .container {
-    margin-left: 50px;
-    margin-right: 50px;
-  }
+@keyframes moveUp {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+        border-radius: 15px;
+    }
 
-  .container .card-container .card {
-    width: 100%;
-  }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .container .card-container .card {
+        width: 100%;
+    }
 }
 </style>
