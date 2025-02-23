@@ -27,9 +27,9 @@ async function login() {
             password: password.value
         });
 
-        console.log(response.data)
+        console.log(response.data.user.id)
         userSession.value = true
-        authStore.setUserSession(true)
+        authStore.setUserSession(true, response.data.user.id)
         // window.alert(response.data.message)
         router.push('/')
     } catch (error) {

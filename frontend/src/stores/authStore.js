@@ -5,10 +5,12 @@ import { useRouter } from 'vue-router'
 export const useAuthStore = defineStore('auth', () => {
     const router = useRouter()
     const userSession = ref(localStorage.getItem('userSession') === 'true')
+    const userId = ref(localStorage.getItem('userId'))
 
-    function setUserSession(value) {
+    function setUserSession(value, userId) {
         userSession.value = value
         localStorage.setItem('userSession', value)
+        localStorage.setItem('userId', userId)
     }
 
     function logout() {
@@ -17,5 +19,5 @@ export const useAuthStore = defineStore('auth', () => {
         router.push('/login')
     }
 
-    return { router, userSession, setUserSession, logout }
+    return { router, userSession, userId, setUserSession, logout }
 })
