@@ -23,9 +23,9 @@ export async function getGoal(id) {
 }
 
 // Create a goal
-export async function createGoal(title, description, target_value) {
-    const [rows] = await pool.query(`INSERT INTO goals (title, description, target_value) VALUES (?, ?, ?)`,
-        [title, description, target_value]
+export async function createGoal(userId, title, description, target_value) {
+    const [rows] = await pool.query(`INSERT INTO goals (user_id, title, description, target_value) VALUES (?, ?, ?, ?)`,
+        [userId, title, description, target_value]
     )
     return rows
 }

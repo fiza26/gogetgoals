@@ -2,9 +2,13 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from './authStore'
 
 export const useGoalsStore = defineStore('goals', () => {
   const router = useRouter()
+
+  const authStore = useAuthStore()
+  const userId = authStore.userId
 
   const allGoals = ref([])
   const emojis = ref(['😁', '😭', '😎', '🤖', '😽', '🤩'])
@@ -46,6 +50,7 @@ export const useGoalsStore = defineStore('goals', () => {
     } else {
       try {
         const response = await axios.post('http://localhost:8000/creategoal', {
+          userId: userId,
           title: goalTitle.value,
           description: goalDescription.value
         })

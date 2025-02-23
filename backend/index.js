@@ -26,8 +26,8 @@ app.get('/goal/:id', async (req, res) => {
 // Create new goal
 app.post('/creategoal', async (req, res) => {
     try {
-        const { title, description } = req.body
-        const newGoal = await createGoal(title, description, 0)
+        const { userId, title, description } = req.body
+        const newGoal = await createGoal(userId, title, description, 0)
         res.json({ result: newGoal })
     } catch (error) {
         console.log('Error creating goal', error)
