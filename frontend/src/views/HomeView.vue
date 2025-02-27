@@ -45,7 +45,7 @@ onMounted(() => {
             </form>
           </div>
         </div>
-        <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id">
+        <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id"> 
           <div class="card-header">
             <h3>{{ goal.emoji }} {{ goal.title }}</h3>
             <div class="options-wrapper">

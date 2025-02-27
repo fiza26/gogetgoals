@@ -15,7 +15,11 @@ export const useGoalsStore = defineStore('goals', () => {
 
   async function getAllGoals() {
     try {
-      const response = await axios.get('http://localhost:8000/goals')
+      const response = await axios.get('http://localhost:8000/goals', {
+        params: {
+          userId: userId
+        }
+      })
       allGoals.value = response.data.result.map(goal => ({
         ...goal,
         emoji: emojis.value[Math.floor(Math.random() * emojis.value.length)],

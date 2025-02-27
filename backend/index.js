@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { getGoals, getGoal, createGoal, editGoal, deleteGoal, getUserProgress, createProgress, deleteProgress, updatePercentage, login, signup } from './database.js'
 
+
 const app = express()
 app.use(cors());
 app.use(express.json())
@@ -12,7 +13,8 @@ app.get('/', (req, res) => {
 
 // Get all goals
 app.get('/goals', async (req, res) => {
-    const goals = await getGoals()
+    const { userId } = req.query
+    const goals = await getGoals(userId)
     res.json({ result: goals })
 })
 

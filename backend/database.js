@@ -11,8 +11,8 @@ const pool = mysql.createPool({
 }).promise()
 
 // Get all goals
-export async function getGoals() {
-    const [rows] = await pool.query('SELECT * FROM goals ORDER BY id DESC')
+export async function getGoals(userId) {
+    const [rows] = await pool.query('SELECT * FROM goals WHERE user_id = ? ORDER BY id DESC', [userId])
     return rows
 }
 
