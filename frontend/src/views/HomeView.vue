@@ -1,10 +1,18 @@
 <script setup>
-import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useGoalsStore } from '@/stores/goalStore'
 import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 
 const authStore = useAuthStore()
+
+const router = useRouter()
+
+onMounted(() => {
+  if (!authStore.userSession) {
+    router.push({ name: 'login' })
+  }
+})
 
 const goalsStore = useGoalsStore()
 
@@ -14,15 +22,6 @@ const editGoal = () => goalsStore.editGoal()
 const closeModal = () => goalsStore.closeModal()
 const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 const addNewGoal = () => goalsStore.addNewGoal()
-
-const route = useRoute()
-const router = useRouter()
-
-onMounted(() => {
-  if (!authStore.userSession) {
-    router.push({ name: 'login' })
-  }
-})
 
 </script>
 
@@ -45,7 +44,7 @@ onMounted(() => {
             </form>
           </div>
         </div>
-        <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id"> 
+        <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id">
           <div class="card-header">
             <h3>{{ goal.emoji }} {{ goal.title }}</h3>
             <div class="options-wrapper">
