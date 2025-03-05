@@ -1,7 +1,11 @@
 <script setup>
-import { useGoalsStore } from '@/stores/goalStore';
+import { useGoalsStore } from '@/stores/goalStore'
 
 const goalsStore = useGoalsStore()
+
+const editGoal = () => goalsStore.editGoal()
+const closeModal = () => goalsStore.closeModal()
+const addNewGoal = () => goalsStore.addNewGoal()
 </script>
 
 <template>
@@ -100,6 +104,19 @@ const goalsStore = useGoalsStore()
                 }
             }
         }
+    }
+}
+
+@keyframes moveUp {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+        border-radius: 15px;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
     }
 }
 </style>
