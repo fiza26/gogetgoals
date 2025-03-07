@@ -25,7 +25,11 @@ const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
         <hr>
         <div class="card-content">
             <p>{{ goal.description }}</p>
-            <span><i class="fa-solid fa-spinner"></i> {{ goal.percentage }}%</span><br>
+            <span v-if="goal?.percentage && goal.percentage > 0"><i class="fa-solid fa-spinner"></i> {{ goal.percentage
+                }}%</span>
+            <span v-if="goal?.percentage === undefined || goal?.percentage === null || goal?.percentage === ''">
+                0%
+            </span>
         </div>
         <RouterLink :to='`/details/${goal.id}`'>
             <button>Details</button>
