@@ -45,6 +45,7 @@ hr {
 }
 
 .card {
+    align-self: flex-start;
     max-width: 40rem;
     padding: 15px;
     border-radius: 15px;
