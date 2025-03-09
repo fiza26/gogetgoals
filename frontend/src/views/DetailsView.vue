@@ -167,13 +167,13 @@ async function deleteUserProgress(progress) {
                         <button v-if="goal.percentage != '100'" @click="createUserProgress(goal)">Update</button>
                     </form>
                 </div>
-                <div class="card-progress" v-for="progress in allProgress" :key="progress.id">
+                <div class="card-progress" v-for="(progress, index) in allProgress" :key="progress.id">
                     <div class="card-progress-header">
                         <div class="card-progress-date">
                             <i class="fa-solid fa-calendar-days"></i> {{ new
                                 Date(progress.progress_created).toLocaleString() }}
                         </div>
-                        <span class="options" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
+                        <span class="options" v-if="index === allProgress.length - 1" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-progress-options" v-if="progress.optionsState">
                             <span class="delete-progress" @click="deleteUserProgress(progress)"><i
                                     class="fa-solid fa-delete-left"></i></span>

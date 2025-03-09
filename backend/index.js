@@ -84,6 +84,7 @@ app.post('/createprogress', async (req, res) => {
     }
 })
 
+// Delete user progress
 app.post('/deleteprogress', async (req, res) => {
     try {
         const { id } = req.body
@@ -94,6 +95,7 @@ app.post('/deleteprogress', async (req, res) => {
     }
 })
 
+// Update percentage
 app.post('/updatepercentage', async (req, res) => {
     try {
         const { id_goal, percentage } = req.body
@@ -104,6 +106,7 @@ app.post('/updatepercentage', async (req, res) => {
     }
 })
 
+// Login
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -120,6 +123,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// User signup
 app.post('/signup', async (req, res) => {
     try {
         const { name, username, password } = req.body
