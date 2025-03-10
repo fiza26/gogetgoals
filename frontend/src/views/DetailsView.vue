@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import { useGoalsStore } from '@/stores/goalStore'
@@ -38,6 +38,7 @@ async function getGoal() {
 getGoal()
 
 const allProgress = ref([])
+const updatedPercentage = ref()
 
 async function getUserProgress() {
     try {
@@ -47,6 +48,9 @@ async function getUserProgress() {
             optionState: false
         }))
         console.log('All user progress', allProgress.value)
+        console.log('Get Before Last Progress:', beforeLastProgress.value)
+        console.log('Get Before Last Progress Percentage:', beforeLastProgress.value.progress_percentage)
+        updatedPercentage.value = beforeLastProgress.value.progress_percentage
     } catch (error) {
         console.log(error)
     }
@@ -115,15 +119,27 @@ async function updateGoalPercentage() {
     }
 }
 
+const beforeLastProgress = computed(() => {
+    if (!allProgress.value || allProgress.value.length < 2) {
+        return null;
+    }
+    return allProgress.value[allProgress.value.length - 2];
+})
+
 async function deleteUserProgress(progress) {
     try {
+        await getUserProgress()
+
         const response = await axios.post(`http://localhost:8000/deleteprogress`, {
-            id: progress.id
+            id_goal: id.value,
+            id: progress.id,
+            percentage: updatedPercentage.value,
         })
         if (response) {
             window.alert('User progress deleted')
         }
         await getUserProgress()
+        location.reload()
     } catch (error) {
         console.log(error)
     }
@@ -139,6 +155,7 @@ async function deleteUserProgress(progress) {
                 <div class="card" v-for="goal in goal" :key="goal.id">
                     <div class="card-header">
                         <h3>{{ goal.title }}</h3>
+                        <!-- <h3>{{ beforeLastProgress.progress_percentage }}</h3> -->
                         <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-header-options" v-if="goal.optionsState">
                             <span class="edit-goal" @click="changeEditState(goal)"><i
@@ -173,7 +190,8 @@ async function deleteUserProgress(progress) {
                             <i class="fa-solid fa-calendar-days"></i> {{ new
                                 Date(progress.progress_created).toLocaleString() }}
                         </div>
-                        <span class="options" v-if="index === allProgress.length - 1" @click="showOptions(progress)"><i class="fa-solid fa-bars"></i></span>
+                        <span class="options" v-if="index === allProgress.length - 1" @click="showOptions(progress)"><i
+                                class="fa-solid fa-bars"></i></span>
                         <div class="card-progress-options" v-if="progress.optionsState">
                             <span class="delete-progress" @click="deleteUserProgress(progress)"><i
                                     class="fa-solid fa-delete-left"></i></span>

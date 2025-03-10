@@ -87,8 +87,9 @@ app.post('/createprogress', async (req, res) => {
 // Delete user progress
 app.post('/deleteprogress', async (req, res) => {
     try {
-        const { id } = req.body
+        const { id_goal, id, percentage } = req.body
         await deleteProgress(id)
+        await updatePercentage(percentage, id_goal)
         res.status(200).json({ message: 'User progress deleted successfully' })
     } catch (error) {
         res.status(500).json({ error: 'An error occured while deleting user progress' })
