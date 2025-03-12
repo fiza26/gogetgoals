@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, RouterView, useRouter, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { useGoalsStore } from '@/stores/goalStore'
 import { useAuthStore } from './stores/authStore';
 

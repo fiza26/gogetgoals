@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import { useGoalsStore } from '@/stores/goalStore'
@@ -155,7 +155,6 @@ async function deleteUserProgress(progress) {
                 <div class="card" v-for="goal in goal" :key="goal.id">
                     <div class="card-header">
                         <h3>{{ goal.title }}</h3>
-                        <!-- <h3>{{ beforeLastProgress.progress_percentage }}</h3> -->
                         <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
                         <div class="card-header-options" v-if="goal.optionsState">
                             <span class="edit-goal" @click="changeEditState(goal)"><i

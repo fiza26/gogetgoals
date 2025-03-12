@@ -54,8 +54,6 @@ hr {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    // justify-content: flex-start;
-    // gap: 30px;
     position: relative;
   }
 }
