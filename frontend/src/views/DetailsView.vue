@@ -7,7 +7,6 @@ import { useAuthStore } from '@/stores/authStore'
 import Modal from '@/components/Modal.vue'
 
 const router = useRouter()
-
 const authStore = useAuthStore()
 
 onMounted(() => {
@@ -17,7 +16,6 @@ onMounted(() => {
 })
 
 const goalsStore = useGoalsStore()
-
 const showOptions = (goal) => goalsStore.showOptions(goal)
 const changeEditState = (goal) => goalsStore.changeEditState(goal)
 const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
@@ -25,34 +23,33 @@ const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 const route = useRoute()
 const id = computed(() => route.params.id)
 
-const goal = ref({})
+const goal = ref([]) // Changed to array to prevent v-for object property iteration
+const isUpdating = ref(false)
 
 async function getGoal() {
     try {
         const response = await axios.get(`http://localhost:8000/goal/${id.value}`)
-        goal.value = response.data.result
+        const result = response.data.result
+        // Fix: Ensure we are storing an array even if the API returns a single object
+        goal.value = Array.isArray(result) ? result : [result]
     } catch (error) {
-        console.log(error)
+        console.error('Error fetching goal:', error)
     }
 }
 getGoal()
 
 const allProgress = ref([])
-const updatedPercentage = ref()
 
 async function getUserProgress() {
     try {
         const response = await axios.get(`http://localhost:8000/getuserprogress/${id.value}`)
-        allProgress.value = response.data.result.map(progress => ({
-            ...progress,
-            optionState: false
-        }))
-        console.log('All user progress', allProgress.value)
-        console.log('Get Before Last Progress:', beforeLastProgress.value)
-        console.log('Get Before Last Progress Percentage:', beforeLastProgress.value.progress_percentage)
-        updatedPercentage.value = beforeLastProgress.value.progress_percentage
+        const result = response.data.result || []
+        allProgress.value = result.map(p => ({
+            ...p,
+            optionsState: false
+        })).reverse()
     } catch (error) {
-        console.log(error)
+        console.error('Error fetching progress:', error)
     }
 }
 getUserProgress()
@@ -60,399 +57,439 @@ getUserProgress()
 const progress = ref('')
 const aiResponse = ref('')
 const percentage = ref('')
-const newUserProgress = ref(null)
 
-async function createUserProgress(goal) {
-    if (progress.value === '') {
-        window.alert('Progress can not be empty')
-    } else {
-        try {
-            const progressHistory = allProgress.value.length > 0 ? allProgress.value : [];
-
-            const geminiResponse = await axios.post(`http://localhost:3000/gemini`, {
-                id_goal: id.value,
-                goalTitle: goal.title,
-                goalDescription: goal.description,
-                progressHistory: progressHistory.map(entry => ({
-                    id_goal: entry.id_goal,
-                    progressText: entry.progress,
-                    progressAiResponse: entry.ai_response,
-                    progressCreated: entry.created
-                })),
-                progress: progress.value
-            })
-            aiResponse.value = geminiResponse.data.result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
-            console.log('Response:', aiResponse)
-
-            percentage.value = geminiResponse.data.percentage
-            console.log('Gemini Response:', geminiResponse.data.percentage);
-
-            if (aiResponse.value) {
-                const response = await axios.post(`http://localhost:8000/createprogress`, {
-                    id_goal: id.value,
-                    progress: progress.value,
-                    ai_response: aiResponse.value,
-                    progress_percentage: percentage.value
-                })
-                newUserProgress.value = response.data.result
-                await updateGoalPercentage()
-                console.log('User Progress:', newUserProgress)
-                await getUserProgress()
-            }
-        } catch (error) {
-            console.log(error)
-        }
+async function createUserProgress(goalData) {
+    if (progress.value.trim() === '') {
+        window.alert('Progress cannot be empty')
+        return
     }
-}
 
-async function updateGoalPercentage() {
+    isUpdating.value = true
     try {
-        const response = await axios.post(`http://localhost:8000/updatepercentage`, {
+        const progressHistory = [...allProgress.value].reverse() // Send in chronological order to Gemini
+        const geminiResponse = await axios.post(`http://localhost:3000/gemini`, {
             id_goal: id.value,
-            percentage: percentage.value
+            goalTitle: goalData.title,
+            goalDescription: goalData.description,
+            progressHistory: progressHistory.map(entry => ({
+                id_goal: entry.id_goal,
+                progressText: entry.progress,
+                progressAiResponse: entry.ai_response,
+                progressCreated: entry.created
+            })),
+            progress: progress.value
         })
-        if (response) {
-            await getGoal()
+
+        aiResponse.value = geminiResponse.data.result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
+        percentage.value = geminiResponse.data.percentage
+
+        if (aiResponse.value) {
+            await axios.post(`http://localhost:8000/createprogress`, {
+                id_goal: id.value,
+                progress: progress.value,
+                ai_response: aiResponse.value,
+                progress_percentage: percentage.value
+            })
+            await updateGoalPercentage(percentage.value)
+            progress.value = ''
+            await getUserProgress()
         }
     } catch (error) {
-        console.log('Error :', error)
+        console.error(error)
+    } finally {
+        isUpdating.value = false
     }
 }
 
-const beforeLastProgress = computed(() => {
-    if (!allProgress.value || allProgress.value.length < 2) {
-        return null;
+async function updateGoalPercentage(newPercent) {
+    try {
+        await axios.post(`http://localhost:8000/updatepercentage`, {
+            id_goal: id.value,
+            percentage: newPercent
+        })
+        await getGoal()
+    } catch (error) {
+        console.error('Error updating percentage:', error)
     }
-    return allProgress.value[allProgress.value.length - 2];
+}
+
+// Logic: Get the percentage of the entry that will become the "latest" after deletion
+const previousPercentage = computed(() => {
+    // allProgress is reversed (newest first). Index 0 is current, Index 1 is the previous one.
+    if (!allProgress.value || allProgress.value.length < 2) return 0;
+    return allProgress.value[1].progress_percentage;
 })
 
-async function deleteUserProgress(progress) {
+async function deleteUserProgress(p) {
     try {
-        await getUserProgress()
-
         const response = await axios.post(`http://localhost:8000/deleteprogress`, {
             id_goal: id.value,
-            id: progress.id,
-            percentage: updatedPercentage.value,
+            id: p.id,
+            percentage: previousPercentage.value,
         })
         if (response) {
             window.alert('User progress deleted')
+            await getUserProgress()
+            await getGoal()
         }
-        await getUserProgress()
-        location.reload()
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
-
 </script>
 
 <template>
-    <main>
+    <main class="detail-page">
         <Modal />
-        <div class="container">
-            <div class="card-container">
-                <div class="card" v-for="goal in goal" :key="goal.id">
-                    <div class="card-header">
-                        <h3>{{ goal.title }}</h3>
-                        <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
-                        <div class="card-header-options" v-if="goal.optionsState">
-                            <span class="edit-goal" @click="changeEditState(goal)"><i
-                                    class="fa-solid fa-pen-to-square"></i></span>
-                            <span class="delete-goal" @click="deleteGoal(goal)"><i
-                                    class="fa-solid fa-delete-left"></i></span>
-                        </div>
+        <div class="container" v-for="g in goal" :key="g.id">
+            <section class="goal-hero-card">
+                <div class="card-header">
+                    <div class="title-area">
+                        <span class="emoji-circle">{{ g.emoji || '🎯' }}</span>
+                        <h2>{{ g.title }}</h2>
                     </div>
-                    <hr>
-                    <div class="card-content">
-                        <p class="goal-completed" v-if="goal.percentage === '100'"><i class="fa-solid fa-check"></i>
-                            This goal is completed
-                        </p>
-                        <p>{{ goal.description }}</p>
-                        <br>
-                        <div class="progress-bar">
-                            <div class="progress" :style="{ width: goal.percentage + '%' }">
-                                <p class="progress-percentage">{{ goal.percentage }}%</p>
-                            </div>
-                        </div>
-                    </div>
+                    <button class="icon-btn" @click="showOptions(g)">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
 
-                    <form class="update-progress" @submit.prevent>
-                        <textarea v-if="goal.percentage != '100'" name="" id=""
-                            placeholder="Write your progress here..." v-model="progress"></textarea><br>
-                        <button v-if="goal.percentage != '100'" @click="createUserProgress(goal)">Update</button>
-                    </form>
-                </div>
-                <div class="card-progress" v-for="(progress, index) in allProgress" :key="progress.id">
-                    <div class="card-progress-header">
-                        <div class="card-progress-date">
-                            <i class="fa-solid fa-calendar-days"></i> {{ new
-                                Date(progress.progress_created).toLocaleString() }}
-                        </div>
-                        <span class="options" v-if="index === allProgress.length - 1" @click="showOptions(progress)"><i
-                                class="fa-solid fa-bars"></i></span>
-                        <div class="card-progress-options" v-if="progress.optionsState">
-                            <span class="delete-progress" @click="deleteUserProgress(progress)"><i
-                                    class="fa-solid fa-delete-left"></i></span>
-                        </div>
-                    </div>
-                    <div class="card-progress-content">
-                        <div class="user-progress">
-                            <p>{{ progress.progress }}</p>
-                            <p>Progress : {{ progress.progress_percentage }}%</p>
-                        </div>
-                        <hr>
-                        <div class="ai-response">
-                            <p><i class="fa-solid fa-star"></i> AI Assistant: {{ progress.ai_response }}</p>
-                        </div>
+                    <div class="options-popover" v-if="g.optionsState">
+                        <button @click="changeEditState(g)"><i class="fa-solid fa-pen"></i> Edit</button>
+                        <button class="delete" @click="deleteGoal(g)"><i class="fa-solid fa-trash"></i> Delete</button>
                     </div>
                 </div>
-            </div>
+
+                <p class="goal-desc">{{ g.description }}</p>
+
+                <div class="overall-progress">
+                    <div class="stats">
+                        <span>Current Progress</span>
+                        <span class="percent-text">{{ g.percentage || 0 }}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" :style="{ width: (Number(g.percentage) || 0) + '%' }"></div>
+                    </div>
+                    <div class="completion-badge" v-if="Number(g.percentage) >= 100">
+                        <i class="fa-solid fa-crown" style="color: rgb(255, 212, 59);"></i> Goal Completed!
+                    </div>
+                </div>
+            </section>
+
+            <section class="update-section" v-if="Number(g.percentage) < 100">
+                <h3>Log New Progress</h3>
+                <div class="input-wrapper">
+                    <textarea v-model="progress" placeholder="What have you done today towards this goal?"
+                        :disabled="isUpdating"></textarea>
+                    <button @click="createUserProgress(g)" :disabled="isUpdating">
+                        <span v-if="!isUpdating">Update Progress</span>
+                        <span v-else><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing...</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="timeline">
+                <h3>Activity History</h3>
+                <div v-if="allProgress.length === 0" class="empty-state">
+                    No progress logged yet. Start your journey above!
+                </div>
+                <div class="timeline-item" v-for="(p, index) in allProgress" :key="p.id">
+                    <div class="timeline-header">
+                        <span class="date">{{ new Date(p.progress_created).toLocaleDateString(undefined, {
+                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                        }) }}</span>
+                        <div class="timeline-actions">
+                            <span class="p-badge">{{ p.progress_percentage }}%</span>
+                            <button v-if="index === 0" class="mini-del" @click="deleteUserProgress(p)">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="timeline-body">
+                        <p class="user-txt">{{ p.progress }}</p>
+                        <div class="ai-box">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <p>{{ p.ai_response }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 </template>
 
 <style lang="scss" scoped>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-a {
-    text-decoration: none;
-    color: black;
-}
-
-hr {
-    border: 1px solid #dddd;
-    border-radius: 15px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+.detail-page {
+    background-color: #f0f4f8;
+    min-height: 100vh;
+    padding: 20px 0;
 }
 
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    margin-left: 80px;
-    margin-right: 80px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
 
-    .card-container {
-        width: 100%;
-        max-width: 40rem;
+.goal-hero-card {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    position: relative;
+
+    .card-header {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        flex-direction: column;
+        margin-bottom: 20px;
+
+        .title-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            .emoji-circle {
+                background: #f1f2f6;
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                color: #2d3436;
+                font-size: 1.4rem;
+                margin: 0;
+            }
+        }
+    }
+}
+
+.goal-desc {
+    color: #636e72;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.overall-progress {
+    .stats {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2d3436;
+
+        .percent-text {
+            color: #00C9FF;
+        }
+    }
+
+    .progress-track {
+        height: 12px;
+        background: #eee;
+        border-radius: 10px;
+        overflow: hidden;
         position: relative;
-        margin-top: 15px;
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%; // Default start
+        }
+    }
+}
+
+.completion-badge {
+    margin-top: 15px;
+    background: #92FE9D;
+    color: #1b4d3e;
+    padding: 10px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.update-section {
+    margin-bottom: 30px;
+
+    h3 {
         margin-bottom: 15px;
-        animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        font-size: 1.1rem;
+        color: #2d3436;
+    }
 
-        .card {
+    .input-wrapper {
+        background: white;
+        padding: 15px;
+        border-radius: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+        textarea {
             width: 100%;
-            padding: 15px;
-            border-radius: 15px;
-            background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            transition: ease-in-out 150ms;
+            border: none;
+            resize: none;
+            height: 80px;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 10px;
 
-            .card-header {
+            &:focus {
+                outline: none;
+            }
+        }
+
+        button {
+            background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            float: right;
+            transition: 0.3s;
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            &:hover:not(:disabled) {
+                transform: translateY(-2px);
+            }
+        }
+
+        &::after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+    }
+}
+
+.timeline {
+    h3 {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        color: #2d3436;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #a4b0be;
+        padding: 20px;
+        font-style: italic;
+    }
+
+    .timeline-item {
+        background: white;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 5px solid #00C9FF;
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+
+            .date {
+                font-size: 0.8rem;
+                color: #a4b0be;
+                font-weight: 600;
+            }
+
+            .timeline-actions {
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                margin-bottom: 10px;
-                cursor: pointer;
+                gap: 10px;
 
-                .options {
-                    margin-left: 10px;
-                    transition: ease-in-out 150ms;
-
-                    &:hover {
-                        transform: scale(1.1);
-                    }
+                .p-badge {
+                    background: #f1f2f6;
+                    padding: 2px 8px;
+                    border-radius: 8px;
+                    font-size: 0.8rem;
+                    font-weight: 700;
                 }
 
-                .card-header-options {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    width: 3rem;
-                    cursor: pointer;
-                    margin-left: 10px;
-                    animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-
-                    .edit-goal {
-                        transition: ease-in-out 150ms;
-
-                        &:hover {
-                            transform: scale(1.1);
-                        }
-                    }
-
-                    .delete-goal {
-                        transition: ease-in-out 150ms;
-
-                        &:hover {
-                            transform: scale(1.1);
-                        }
-                    }
-                }
-            }
-
-            .card-content {
-                margin-top: 15px;
-
-                .goal-completed {
-                    background-color: #92FE9D;
-                    color: white;
-                    padding: 10px;
-                    width: 100%;
-                    border-radius: 15px;
-                    text-align: center;
-                    margin-bottom: 30px;
-                }
-
-                .progress-bar {
-                    width: 100%;
-                    border: 2px solid white;
-                    border-radius: 15px;
-                    margin-top: 10px;
-
-                    .progress {
-                        border-radius: 15px;
-                        width: 0%;
-                        transition: ease-in-out 0.1s;
-                        background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-
-                        .progress-percentage {
-                            text-align: center;
-                            color: white;
-                        }
-                    }
-                }
-            }
-
-            .update-progress {
-                margin-top: 15px;
-
-                textarea {
-                    font-family: 'Poppins', sans-serif;
-                    border-radius: 10px;
-                    width: 100%;
-                    height: 5rem;
-                    padding: 10px;
+                .mini-del {
                     border: none;
-                    resize: vertical;
-                }
-            }
-
-            button {
-                font-family: 'Poppins', sans-serif;
-                border: none;
-                color: white;
-                padding: 7px;
-                width: 8rem;
-                margin-top: 5px;
-                border-radius: 10px;
-                cursor: pointer;
-                background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-                float: right;
-                transition: ease-in-out 150ms;
-                box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-
-
-                &:hover {
-                    transform: scale(1.1);
+                    background: none;
+                    color: #ff7675;
+                    cursor: pointer;
+                    font-size: 0.9rem;
                 }
             }
         }
 
-        .card-progress {
-            width: 100%;
-            margin-top: 15px;
+        .user-txt {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .ai-box {
+            background: linear-gradient(135deg, rgba(0, 201, 255, 0.05) 0%, rgba(146, 254, 157, 0.05) 100%);
             padding: 15px;
-            border-radius: 15px;
-            background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            transition: ease-in-out 150ms;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
 
-            .card-progress-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-
-                .card-progress-date {
-                    color: white;
-                    border-radius: 15px;
-                    padding: 5px;
-                    width: 100%;
-                    text-align: center;
-                    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-                }
-
-                .options {
-                    margin-left: 10px;
-                    cursor: pointer;
-                    transition: ease-in-out 150ms;
-
-                    &:hover {
-                        transform: scale(1.1);
-                    }
-                }
-
-                .card-progress-options {
-                    margin-left: 15px;
-                    cursor: pointer;
-                    animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-
-                    .delete-progress {
-                        transition: ease-in-out 150ms;
-
-                        &:hover {
-                            transform: scale(1.1);
-                        }
-                    }
-                }
-
+            i {
+                color: #00C9FF;
+                margin-top: 4px;
             }
 
-            .card-progress-content {
-                margin-top: 15px;
-
-                .user-progress {
-                    margin-bottom: 15px;
-                    word-wrap: break-word;
-                }
-
-                .ai-response {
-                    margin-top: 15px;
-                }
+            p {
+                font-size: 0.9rem;
+                color: #4b5563;
+                line-height: 1.5;
+                margin: 0;
             }
         }
     }
 }
 
-@keyframes moveUp {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-        border-radius: 15px;
-    }
+.options-popover {
+    position: absolute;
+    top: 60px;
+    right: 30px;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 8px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
 
-    100% {
-        transform: scale(1);
-        opacity: 1;
+    button {
+        background: none;
+        border: none;
+        padding: 10px 20px;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 8px;
+
+        &:hover {
+            background: #f8f9fa;
+        }
+
+        &.delete {
+            color: #ff7675;
+        }
     }
 }
 
-@media screen and (max-width: 768px) {
-    .container {
-        margin-left: 50px;
-        margin-right: 50px;
-    }
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #b2bec3;
+    cursor: pointer;
 }
 </style>

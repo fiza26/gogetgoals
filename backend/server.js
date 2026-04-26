@@ -1,29 +1,33 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const port = 3000
-const app = express()
-app.use(cors())
-app.use(express.json())
+const port = 3000;
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-dotenv.config()
+dotenv.config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.post('/gemini', async (req, res) => {
-    try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+app.post("/gemini", async (req, res) => {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const { id_goal, goalTitle, goalDescription, progressHistory, progress } = req.body;
+    const { id_goal, goalTitle, goalDescription, progressHistory, progress } =
+      req.body;
 
-        // Format all progress history into a readable list
-        const formattedHistory = progressHistory.map(entry =>
-            `- [${entry.progressCreated}] ${entry.progressText} (AI Feedback: ${entry.progressAiResponse})`
-        ).join("\n");
+    // Format all progress history into a readable list
+    const formattedHistory = progressHistory
+      .map(
+        (entry) =>
+          `- [${entry.progressCreated}] ${entry.progressText} (AI Feedback: ${entry.progressAiResponse})`,
+      )
+      .join("\n");
 
-        const prompt = `
+    const prompt = `
         The user has made a progress update: "${progress}".  
         Their goal is titled "${goalTitle}" with the description: "${goalDescription}".  
         The goal ID is: ${id_goal}.  
@@ -42,29 +46,34 @@ app.post('/gemini', async (req, res) => {
         ⚠️ Focus **only** on feedback—do not request additional information or ask questions.  
         `;
 
-        const result = await model.generateContent(prompt)
+    const result = await model.generateContent(prompt);
 
-        // Extract the text response properly
-        const resultText = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text  // Adjust if needed based on the response format
+    // Extract the text response properly
+    const resultText =
+      result?.response?.candidates?.[0]?.content?.parts?.[0]?.text; // Adjust if needed based on the response format
 
-        const secondPrompt = `Based on the following progress, provide ONLY a percentage (0-100) without any explanation: ${resultText}`;
+    const secondPrompt = `Based on the following progress, provide ONLY a percentage (0-100) without any explanation: ${resultText}`;
 
-        const decidePercentage = await model.generateContent(secondPrompt);
+    const decidePercentage = await model.generateContent(secondPrompt);
 
-        // Extract percentage value
-        const percentageText = decidePercentage?.response?.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\D/g, '');  // Remove non-numeric characters
+    // Extract percentage value
+    const percentageText =
+      decidePercentage?.response?.candidates?.[0]?.content?.parts?.[0]?.text.replace(
+        /\D/g,
+        "",
+      ); // Remove non-numeric characters
 
-        const percentage = Math.min(100, Math.max(0, parseInt(percentageText, 10)));  // Ensure it's between 0-100
+    const percentage = Math.min(100, Math.max(0, parseInt(percentageText, 10))); // Ensure it's between 0-100
 
-        console.log('Progress Percentage:', percentage);
+    console.log("Progress Percentage:", percentage);
 
-        res.json({ result: result, percentage: percentage});
-    } catch (error) {
-        console.log('Error:', error);
-        res.status(500).json({ error: 'An error occurred while processing your request' })
-    }
+    res.json({ result: result, percentage: percentage });
+  } catch (error) {
+    console.log("Error:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while processing your request" });
+  }
 });
 
-app.listen(port, () => console.log('Listening on port 3000'))
-
-
+app.listen(port, () => console.log("Listening on port 3000"));

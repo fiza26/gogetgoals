@@ -12,151 +12,217 @@ const deleteGoal = (goal) => goalsStore.deleteGoal(goal)
 <template>
     <div class="card" v-for="goal in goalsStore.allGoals" :key="goal.id">
         <div class="card-header">
-            <h3>{{ goal.emoji }} {{ goal.title }}</h3>
-            <div class="options-wrapper">
-                <span class="options" @click="showOptions(goal)"><i class="fa-solid fa-bars"></i></span>
-                <div class="card-header-options" v-if="goal.optionsState">
-                    <span class="edit-goal" @click="changeEditState(goal)"><i
-                            class="fa-solid fa-pen-to-square"></i></span>
-                    <span class="delete-goal" @click="deleteGoal(goal)"><i class="fa-solid fa-delete-left"></i></span>
+            <div class="title-group">
+                <span class="emoji-box">{{ goal.emoji }}</span>
+                <h3>{{ goal.title }}</h3>
+            </div>
+
+            <div class="options-container">
+                <button class="icon-btn menu-btn" @click.stop="showOptions(goal)"
+                    :class="{ active: goal.optionsState }">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+
+                <Transition name="slide-fade">
+                    <div class="options-menu" v-if="goal.optionsState">
+                        <button class="icon-btn edit" @click="changeEditState(goal)">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="icon-btn delete" @click="deleteGoal(goal)">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </Transition>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <p class="description">{{ goal.description }}</p>
+
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span><i class="fa-solid fa-chart-line"></i> Progress</span>
+                    <span class="percentage">{{ goal.percentage || 0 }}%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" :style="{ width: (goal.percentage || 0) + '%' }"></div>
                 </div>
             </div>
         </div>
-        <hr>
-        <div class="card-content">
-            <p>{{ goal.description }}</p>
-            <span v-if="goal?.percentage && goal.percentage > 0"><i class="fa-solid fa-spinner"></i> {{ goal.percentage
-                }}%</span>
-            <span v-if="goal?.percentage === undefined || goal?.percentage === null || goal?.percentage === ''">
-                0%
-            </span>
+
+        <div class="card-footer">
+            <RouterLink :to="`/details/${goal.id}`" class="details-link">
+                Details <i class="fa-solid fa-arrow-right-long"></i>
+            </RouterLink>
         </div>
-        <RouterLink :to='`/details/${goal.id}`'>
-            <button>Details</button>
-        </RouterLink>
     </div>
 </template>
 
 <style lang="scss" scoped>
-hr {
-    border: 1px solid #dddd;
-    border-radius: 15px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-}
-
 .card {
-    align-self: flex-start;
-    max-width: 40rem;
-    padding: 15px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    transition: ease-in-out 150ms;
-    animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
 
     .card-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
-        cursor: pointer;
+        margin-bottom: 15px;
 
-        .options-wrapper {
+        .title-group {
             display: flex;
-            justify-content: flex-end;
             align-items: center;
-            width: 100px;
-        }
+            gap: 12px;
 
-        .options {
-            margin-left: 10px;
-            transition: ease-in-out 150ms;
-
-            &:hover {
-                transform: scale(1.1);
-            }
-        }
-
-        .card-header-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            width: 3rem;
-            cursor: pointer;
-            margin-left: 10px;
-            animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-
-            .edit-goal {
-                transition: ease-in-out 150ms;
-
-                &:hover {
-                    transform: scale(1.1);
-                }
+            .emoji-box {
+                font-size: 1.5rem;
+                background: #f8f9fa;
+                padding: 8px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .delete-goal {
-                transition: ease-in-out 150ms;
-
-                &:hover {
-                    transform: scale(1.1);
-                }
+            h3 {
+                font-size: 1.15rem;
+                color: #2d3436;
+                font-weight: 600;
+                margin: 0;
             }
         }
     }
 
-    .card-content {
-        margin-top: 15px;
+    .options-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
 
-        p {
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .options-menu {
+            display: flex;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 30px;
         }
     }
 
-    button {
-        font-family: 'Poppins', sans-serif;
+    .icon-btn {
         border: none;
-        color: white;
-        padding: 7px;
-        width: 8rem;
-        margin-top: 5px;
-        border-radius: 10px;
+        background: transparent;
         cursor: pointer;
-        background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-        float: right;
-        transition: ease-in-out 150ms;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-
+        color: #b2bec3;
+        transition: 0.2s ease;
+        font-size: 1rem;
 
         &:hover {
-            transform: scale(1.1);
+            color: #00C9FF;
+        }
+
+        &.delete:hover {
+            color: #ff7675;
+        }
+
+        &.active {
+            color: #2d3436;
+        }
+    }
+
+    .card-body {
+        .description {
+            color: #636e72;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .progress-section {
+            .progress-info {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.85rem;
+                color: #2d3436;
+                font-weight: 600;
+                margin-bottom: 8px;
+
+                .percentage {
+                    color: #00C9FF;
+                }
+            }
+
+            .progress-bar-bg {
+                height: 8px;
+                background: #eee;
+                border-radius: 10px;
+                overflow: hidden;
+
+                .progress-bar-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+                    border-radius: 10px;
+                    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+                }
+            }
+        }
+    }
+
+    .card-footer {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+
+        .details-link {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.2);
+
+            &:hover {
+                gap: 12px;
+                box-shadow: 0 6px 20px rgba(0, 201, 255, 0.3);
+            }
         }
     }
 }
 
-@keyframes moveUp {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-        border-radius: 15px;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+/* Animations */
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
 }
 
-@media screen and (max-width: 768px) {
-    .container {
-        margin-left: 50px;
-        margin-right: 50px;
-    }
+.slide-fade-enter-from {
+    transform: translateX(10px);
+    opacity: 0;
+}
 
-    .container .card-container .card {
-        width: 100%;
+@media (max-width: 768px) {
+    .card {
+        max-width: 100%;
     }
 }
 </style>

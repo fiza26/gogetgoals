@@ -9,114 +9,186 @@ const addNewGoal = () => goalsStore.addNewGoal()
 </script>
 
 <template>
-    <div class="modal" v-if="goalsStore.modalState || goalsStore.editState">
-        <button class="close-modal" @click="closeModal"><i class="fa-solid fa-x"></i></button>
-        <div class="modal-content">
-            <form class="new-goal-form" @submit.prevent v-if="goalsStore.modalState">
-                <input type="text" placeholder="title" v-model="goalsStore.goalTitle">
-                <input type="text" placeholder="description" v-model="goalsStore.goalDescription">
-                <button type="button" @click="addNewGoal">Add New Goal</button>
-            </form>
-            <form class="new-goal-form" @submit.prevent v-if="goalsStore.editState">
-                <input type="text" placeholder="title" v-model="goalsStore.goalTitle">
-                <input type="text" placeholder="description" v-model="goalsStore.goalDescription">
-                <button type="button" @click="editGoal">Update Goal</button>
-            </form>
+    <Transition name="fade">
+        <div class="modal-overlay" v-if="goalsStore.modalState || goalsStore.editState" @click.self="closeModal">
+
+            <div class="modal-card">
+                <button class="close-btn" @click="closeModal" aria-label="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="modal-header">
+                    <h2>{{ goalsStore.editState ? 'Update Your Goal' : 'Create New Goal' }}</h2>
+                    <p>Small steps lead to big results.</p>
+                </div>
+
+                <form class="goal-form" @submit.prevent>
+                    <div class="input-group">
+                        <label>Title</label>
+                        <input type="text" placeholder="What do you want to achieve?" v-model="goalsStore.goalTitle">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Description</label>
+                        <textarea placeholder="Add some details..." v-model="goalsStore.goalDescription"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button v-if="goalsStore.modalState" type="submit" class="btn-primary" @click="addNewGoal">
+                            Add Goal
+                        </button>
+                        <button v-if="goalsStore.editState" type="submit" class="btn-primary" @click="editGoal">
+                            Update Goal
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </Transition>
 </template>
 
 <style lang="scss" scoped>
-.modal {
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px); // Glass effect
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 5;
+    z-index: 1000;
+    padding: 20px;
+}
 
-    .close-modal {
-        position: fixed;
+.modal-card {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+
+    .close-btn {
+        position: absolute;
         top: 20px;
-        right: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        font-family: "Poppins", sans-serif;
+        right: 20px;
+        background: #f1f2f6;
         border: none;
-        width: 50px;
-        height: 50px;
-        padding: 20px;
-        border-radius: 50px;
-        transition: ease-in-out 150ms;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        color: #57606f;
+        transition: 0.2s;
 
         &:hover {
-            transform: scale(1.1);
-        }
-    }
-
-    .modal-content {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        padding: 50px;
-        animation: moveUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-
-        .new-goal-form {
-            height: 12rem;
-            width: 30rem;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
-
-            input {
-                font-family: 'Poppins', sans-serif;
-                width: 100%;
-                padding: 10px;
-                margin-top: 10px;
-                border-radius: 15px;
-                border: none;
-            }
-
-            button {
-                font-family: 'Poppins', sans-serif;
-                border: none;
-                color: white;
-                padding: 7px;
-                width: 8rem;
-                border-radius: 10px;
-                cursor: pointer;
-                background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-                float: right;
-                margin-top: 15px;
-                transition: ease-in-out 150ms;
-                box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-
-                &:hover {
-                    transform: scale(1.1);
-                }
-            }
+            background: #ff4757;
+            color: white;
+            transform: rotate(90deg);
         }
     }
 }
 
-@keyframes moveUp {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-        border-radius: 15px;
+.modal-header {
+    margin-bottom: 25px;
+
+    h2 {
+        color: #2d3436;
+        font-size: 1.5rem;
+        margin-bottom: 5px;
     }
 
-    100% {
-        transform: scale(1);
-        opacity: 1;
+    p {
+        color: #a4b0be;
+        font-size: 0.9rem;
     }
+}
+
+.goal-form {
+    .input-group {
+        margin-bottom: 20px;
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 8px;
+            margin-left: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid #f1f2f6;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+
+            &:focus {
+                outline: none;
+                border-color: #00C9FF;
+                background: rgba(0, 201, 255, 0.02);
+            }
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+    }
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 10px 20px rgba(0, 201, 255, 0.2);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(0, 201, 255, 0.3);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
